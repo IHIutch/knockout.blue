@@ -1,0 +1,232 @@
+/**
+ * Bolão-style social image: the full knockout bracket converging from the
+ * outer edges to the predicted champion in the center, 1200×630. Rendered
+ * with takumi (WASM on workerd). Server-only — import dynamically.
+ *
+ * Takumi notes: default display is inline (every box sets flex explicitly);
+ * emoji flags don't render, so flags come from flagcdn.com PNGs; the WASM
+ * build's embedded Manrope (Latin) covers everything we draw.
+ */
+import { render } from 'takumi-js'
+import type { ResolvedBracket, ResolvedMatch } from '../bracket/derive'
+import { TEAMS, type TeamCode } from '../tournament/data'
+
+/** ISO 3166-1 alpha-2 codes for flagcdn.com (gb-eng/gb-sct for the home nations). */
+const FLAG_ISO: Record<TeamCode, string> = {
+  MEX: 'mx', KOR: 'kr', RSA: 'za', CZE: 'cz',
+  CAN: 'ca', SUI: 'ch', QAT: 'qa', BIH: 'ba',
+  BRA: 'br', MAR: 'ma', SCO: 'gb-sct', HAI: 'ht',
+  USA: 'us', TUR: 'tr', PAR: 'py', AUS: 'au',
+  GER: 'de', ECU: 'ec', CIV: 'ci', CUW: 'cw',
+  NED: 'nl', JPN: 'jp', SWE: 'se', TUN: 'tn',
+  BEL: 'be', IRN: 'ir', EGY: 'eg', NZL: 'nz',
+  ESP: 'es', URU: 'uy', KSA: 'sa', CPV: 'cv',
+  FRA: 'fr', SEN: 'sn', NOR: 'no', IRQ: 'iq',
+  ARG: 'ar', AUT: 'at', ALG: 'dz', JOR: 'jo',
+  POR: 'pt', COL: 'co', UZB: 'uz', COD: 'cd',
+  ENG: 'gb-eng', CRO: 'hr', PAN: 'pa', GHA: 'gh',
+}
+
+const flagUrl = (team: TeamCode, width: 20 | 80 = 20) =>
+  `https://flagcdn.com/w${width}/${FLAG_ISO[team]}.png`
+
+/** Bracket halves: matches feeding SF 101 read left→center, SF 102 center←right. */
+const LEFT = { r32: [74, 77, 73, 75, 83, 84, 81, 82], r16: [89, 90, 93, 94], qf: [97, 98], sf: 101 }
+const RIGHT = { r32: [76, 78, 79, 80, 86, 88, 85, 87], r16: [91, 92, 95, 96], qf: [99, 100], sf: 102 }
+
+const colors = {
+  bg: '#09090b',
+  card: '#18181b',
+  border: '#27272a',
+  text: '#e4e4e7',
+  dim: '#52525b',
+  accent: '#38bdf8',
+  accentBg: 'rgba(14, 165, 233, 0.18)',
+}
+
+function TeamLine({ team, picked }: { team: TeamCode | null; picked: boolean }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '2px 6px',
+        borderRadius: 4,
+        backgroundColor: picked ? colors.accentBg : 'transparent',
+      }}
+    >
+      {team ? (
+        <img src={flagUrl(team)} width={16} height={12} style={{ borderRadius: 2 }} />
+      ) : (
+        <div style={{ display: 'flex', width: 16, height: 12, backgroundColor: colors.border, borderRadius: 2 }} />
+      )}
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: picked ? 800 : 500,
+          color: team ? (picked ? '#f0f9ff' : colors.text) : colors.dim,
+        }}
+      >
+        {team ?? '···'}
+      </span>
+    </div>
+  )
+}
+
+function MatchBox({ m }: { m: ResolvedMatch }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: colors.card,
+        border: `1px solid ${colors.border}`,
+        borderRadius: 6,
+        padding: 2,
+      }}
+    >
+      <TeamLine team={m.home} picked={m.picked !== null && m.picked === m.home} />
+      <TeamLine team={m.away} picked={m.picked !== null && m.picked === m.away} />
+    </div>
+  )
+}
+
+function Column({ matches, derived }: { matches: number[]; derived: ResolvedBracket }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flexGrow: 1,
+        width: 92,
+        gap: 4,
+      }}
+    >
+      {matches.map((n) => (
+        <MatchBox key={n} m={derived.matches[n]} />
+      ))}
+    </div>
+  )
+}
+
+function Center({ derived }: { derived: ResolvedBracket }) {
+  const champion = derived.champion ? TEAMS[derived.champion] : null
+  const final = derived.matches[104]
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 210,
+        gap: 14,
+      }}
+    >
+      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 3, color: colors.dim }}>
+        CHAMPION
+      </span>
+      {champion ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <img
+            src={flagUrl(champion.code, 80)}
+            width={80}
+            height={60}
+            style={{ borderRadius: 8, border: `2px solid ${colors.accent}` }}
+          />
+          <span style={{ fontSize: 26, fontWeight: 800, color: '#f0f9ff', textAlign: 'center' }}>
+            {champion.name}
+          </span>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div
+            style={{
+              display: 'flex',
+              width: 80,
+              height: 60,
+              borderRadius: 8,
+              border: `2px dashed ${colors.border}`,
+            }}
+          />
+          <span style={{ fontSize: 20, fontWeight: 700, color: colors.dim }}>TBD</span>
+        </div>
+      )}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: colors.card,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 8,
+          padding: 6,
+          width: 130,
+        }}
+      >
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: colors.dim, padding: '0 6px 2px' }}>
+          FINAL · JUL 19
+        </span>
+        <TeamLine team={final.home} picked={final.picked !== null && final.picked === final.home} />
+        <TeamLine team={final.away} picked={final.picked !== null && final.picked === final.away} />
+      </div>
+    </div>
+  )
+}
+
+export function BracketImage({ handle, derived }: { handle: string; derived: ResolvedBracket }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: 1200,
+        height: 630,
+        backgroundColor: colors.bg,
+        padding: '18px 24px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <span style={{ fontSize: 24, fontWeight: 800, color: '#fafafa' }}>bracket</span>
+          <span style={{ fontSize: 24, fontWeight: 800, color: colors.accent }}>.blue</span>
+        </div>
+        <span style={{ fontSize: 15, fontWeight: 600, color: colors.dim }}>
+          World Cup 2026 · {derived.completeness.picked}/{derived.completeness.total} picks
+        </span>
+      </div>
+
+      <div style={{ display: 'flex', flexGrow: 1, gap: 8 }}>
+        <Column matches={LEFT.r32} derived={derived} />
+        <Column matches={LEFT.r16} derived={derived} />
+        <Column matches={LEFT.qf} derived={derived} />
+        <Column matches={[LEFT.sf]} derived={derived} />
+        <Center derived={derived} />
+        <Column matches={[RIGHT.sf]} derived={derived} />
+        <Column matches={RIGHT.qf} derived={derived} />
+        <Column matches={RIGHT.r16} derived={derived} />
+        <Column matches={RIGHT.r32} derived={derived} />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+        <span style={{ fontSize: 16, fontWeight: 700, color: colors.text }}>@{handle}</span>
+      </div>
+    </div>
+  )
+}
+
+const imageCache = new Map<string, ArrayBuffer>()
+
+export async function renderBracketImage(
+  handle: string,
+  derived: ResolvedBracket,
+): Promise<Uint8Array> {
+  return render(<BracketImage handle={handle} derived={derived} />, {
+    width: 1200,
+    height: 630,
+    format: 'png',
+    resourcesOptions: { cache: imageCache },
+  })
+}

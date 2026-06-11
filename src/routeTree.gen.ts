@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
 import { Route as BHandleRouteImport } from './routes/b.$handle'
+import { Route as BHandleOgDotpngRouteImport } from './routes/b.$handle.og[.]png'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,34 +29,42 @@ const BHandleRoute = BHandleRouteImport.update({
   path: '/b/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BHandleOgDotpngRoute = BHandleOgDotpngRouteImport.update({
+  id: '/og.png',
+  path: '/og.png',
+  getParentRoute: () => BHandleRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/b/$handle': typeof BHandleRoute
+  '/b/$handle': typeof BHandleRouteWithChildren
   '/oauth/callback': typeof OauthCallbackRoute
+  '/b/$handle/og.png': typeof BHandleOgDotpngRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/b/$handle': typeof BHandleRoute
+  '/b/$handle': typeof BHandleRouteWithChildren
   '/oauth/callback': typeof OauthCallbackRoute
+  '/b/$handle/og.png': typeof BHandleOgDotpngRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/b/$handle': typeof BHandleRoute
+  '/b/$handle': typeof BHandleRouteWithChildren
   '/oauth/callback': typeof OauthCallbackRoute
+  '/b/$handle/og.png': typeof BHandleOgDotpngRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/b/$handle' | '/oauth/callback'
+  fullPaths: '/' | '/b/$handle' | '/oauth/callback' | '/b/$handle/og.png'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/b/$handle' | '/oauth/callback'
-  id: '__root__' | '/' | '/b/$handle' | '/oauth/callback'
+  to: '/' | '/b/$handle' | '/oauth/callback' | '/b/$handle/og.png'
+  id: '__root__' | '/' | '/b/$handle' | '/oauth/callback' | '/b/$handle/og.png'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BHandleRoute: typeof BHandleRoute
+  BHandleRoute: typeof BHandleRouteWithChildren
   OauthCallbackRoute: typeof OauthCallbackRoute
 }
 
@@ -82,12 +91,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/b/$handle/og.png': {
+      id: '/b/$handle/og.png'
+      path: '/og.png'
+      fullPath: '/b/$handle/og.png'
+      preLoaderRoute: typeof BHandleOgDotpngRouteImport
+      parentRoute: typeof BHandleRoute
+    }
   }
 }
 
+interface BHandleRouteChildren {
+  BHandleOgDotpngRoute: typeof BHandleOgDotpngRoute
+}
+
+const BHandleRouteChildren: BHandleRouteChildren = {
+  BHandleOgDotpngRoute: BHandleOgDotpngRoute,
+}
+
+const BHandleRouteWithChildren =
+  BHandleRoute._addFileChildren(BHandleRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BHandleRoute: BHandleRoute,
+  BHandleRoute: BHandleRouteWithChildren,
   OauthCallbackRoute: OauthCallbackRoute,
 }
 export const routeTree = rootRouteImport

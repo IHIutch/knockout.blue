@@ -17,6 +17,8 @@ export const Route = createFileRoute('/b/$handle')({
     const description = champion
       ? `Champion pick: ${champion.name} ${champion.flag} · ${derived.completeness.picked}/${derived.completeness.total} picks`
       : `${derived.completeness.picked}/${derived.completeness.total} picks made`
+    // Absolute URL required by OG crawlers; production origin is what matters to them.
+    const ogImage = `https://bracket.blue/b/${loaderData.handle}/og.png`
     return {
       meta: [
         { title: `${title} — bracket.blue` },
@@ -24,7 +26,11 @@ export const Route = createFileRoute('/b/$handle')({
         { property: 'og:title', content: title },
         { property: 'og:description', content: description },
         { property: 'og:type', content: 'website' },
-        { name: 'twitter:card', content: 'summary' },
+        { property: 'og:image', content: ogImage },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:image', content: ogImage },
       ],
     }
   },
