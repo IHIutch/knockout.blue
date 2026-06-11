@@ -4,5 +4,11 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
-  "routes": [{ "pattern": "bracket.blue", "custom_domain": true }]
+  "routes": [{ "pattern": "bracket.blue", "custom_domain": true }],
+  // KV ids are placeholders until `wrangler kv namespace create` (see README).
+  // Local dev simulates these bindings automatically.
+  "kv_namespaces": [
+    { "binding": "OAUTH_SESSION", "id": "REPLACE_WITH_OAUTH_SESSION_KV_ID" },
+    { "binding": "OAUTH_STATE", "id": "REPLACE_WITH_OAUTH_STATE_KV_ID" }
+  ]
 }

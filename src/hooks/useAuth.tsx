@@ -1,4 +1,3 @@
-import type { OAuthUserAgent } from '@atcute/oauth-browser-client'
 import {
   createContext,
   useCallback,
@@ -7,17 +6,21 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { resolveActor } from '../lib/atproto/identity'
+import { getSessionUser, logout, startLogin } from '../server/auth'
 
 export type AuthState =
   | { status: 'loading' }
   | { status: 'anonymous' }
-  | { status: 'signed-in'; did: string; handle: string; agent: OAuthUserAgent }
+  | { status: 'signed-in'; did: string; handle: string }
 
 interface AuthApi {
   state: AuthState
-  /** Resolves the identifier and redirects to the account's auth server. */
-  signIn: (identifier: string) => Promise<void>
+  /**
+   * Start the OAuth flow and navigate away. Null identifier = one-click
+   * "Sign in with Bluesky" (authorize against bsky.social, no handle
+   * needed); otherwise a handle, DID, or PDS URL.
+   */
+  signIn: (identifier: string | null) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -28,23 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    // oauth.ts is client-only; the dynamic import keeps it out of SSR.
-    import('../lib/atproto/oauth')
-      .then(async ({ restoreSession }) => {
-        const agent = await restoreSession()
+    getSessionUser()
+      .then((user) => {
         if (cancelled) return
-        if (!agent) {
-          setState({ status: 'anonymous' })
-          return
-        }
-        const actor = await resolveActor(agent.sub)
-        if (cancelled) return
-        setState({
-          status: 'signed-in',
-          did: agent.sub,
-          handle: actor?.handle ?? agent.sub,
-          agent,
-        })
+        setState(user ? { status: 'signed-in', ...user } : { status: 'anonymous' })
       })
       .catch(() => {
         if (!cancelled) setState({ status: 'anonymous' })
@@ -54,16 +44,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const signIn = useCallback(async (identifier: string) => {
-    const { startLogin } = await import('../lib/atproto/oauth')
-    await startLogin(identifier)
+  const signIn = useCallback(async (identifier: string | null) => {
+    const url = await startLogin({ data: identifier })
+    window.location.assign(url)
+    // Give the browser a beat to navigate so callers don't flash error UI.
+    await new Promise((resolve) => setTimeout(resolve, 200))
   }, [])
 
   const signOut = useCallback(async () => {
-    const { logout } = await import('../lib/atproto/oauth')
-    await logout(state.status === 'signed-in' ? state.agent : null)
+    await logout()
     setState({ status: 'anonymous' })
-  }, [state])
+  }, [])
 
   return <AuthContext.Provider value={{ state, signIn, signOut }}>{children}</AuthContext.Provider>
 }

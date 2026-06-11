@@ -11,7 +11,10 @@ import { cloudflare } from '@cloudflare/vite-plugin'
 // The loopback client_id below is the spec-defined exception for local dev.
 const DEV_ORIGIN = 'http://127.0.0.1:3000'
 const PROD_ORIGIN = 'https://bracket.blue'
-const OAUTH_SCOPE = 'atproto transition:generic'
+// Granular scope: consent screen grants write access ONLY to our record
+// collection, not the whole account (string built by @atcute/oauth-types
+// scope.repo({ collection: ['blue.bracket.wc2026'] })).
+const OAUTH_SCOPE = 'atproto repo?collection=blue.bracket.wc2026'
 
 const config = defineConfig(({ command }) => {
   const dev = command === 'serve'
@@ -22,7 +25,12 @@ const config = defineConfig(({ command }) => {
 
   return {
     resolve: { tsconfigPaths: true },
-    server: { host: '127.0.0.1' },
+    server: {
+      host: '127.0.0.1',
+      // Local KV (miniflare) persists under .wrangler/ — a watched write
+      // there would reload the page mid-OAuth-redirect.
+      watch: { ignored: ['**/.wrangler/**'] },
+    },
     define: {
       'import.meta.env.VITE_OAUTH_CLIENT_ID': JSON.stringify(clientId),
       'import.meta.env.VITE_OAUTH_REDIRECT_URI': JSON.stringify(redirectUri),

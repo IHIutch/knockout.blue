@@ -24,15 +24,34 @@ npm run deploy   # build + wrangler deploy (requires `wrangler login`)
 
 ### OAuth notes
 
+- **Server-side sessions**: OAuth runs in server functions via `@atcute/oauth-node-client`
+  (public client — no JWKs). Tokens live in Cloudflare KV (`OAUTH_SESSION`/`OAUTH_STATE`
+  bindings, simulated locally); the browser only holds an HMAC-signed HTTP-only cookie
+  with `{ did, handle }`. PDS writes happen in `src/server/auth.ts` server functions.
+- **Granular scope**: `atproto repo?collection=blue.bracket.wc2026` — consent grants
+  write access to our record collection only, not the whole account.
+- **Sign-in UX**: one-click "Sign in with Bluesky" authorizes against `https://bsky.social`
+  with no handle needed (the PDS identifies the user, and offers account creation);
+  self-hosters can enter a handle, DID, or PDS URL.
 - atproto OAuth forbids `localhost` as an origin. Dev runs on `127.0.0.1` and uses the
-  spec's loopback client (`client_id` literally starts with `http://localhost?...`) —
-  wired up automatically in `vite.config.ts`.
-- Production `client_id` is `https://bracket.blue/oauth/client-metadata.json`, served as a
-  static asset from `public/`.
-- `src/lib/atproto/oauth.ts` is the **only** module importing
-  `@atcute/oauth-browser-client`, which is browser-only. It is loaded exclusively via
-  dynamic `import()` inside effects/handlers and throws if evaluated during SSR. Keep it
-  that way or the Workers build breaks.
+  spec's loopback client — wired automatically in `vite.config.ts`. Production `client_id`
+  is `https://bracket.blue/oauth/client-metadata.json` (static asset in `public/`).
+- **Module-graph rule**: anything importing `cloudflare:workers` (everything in
+  `src/server/` except `auth.ts`'s server-fn wrappers) must stay out of the client graph —
+  server fns load those modules via dynamic `import()` inside handler bodies, and route
+  files' `server.handlers` do the same. Violations show up as
+  "Failed to resolve import cloudflare:workers" in dev.
+
+### Deploy prerequisites (one-time)
+
+```bash
+wrangler login
+wrangler kv namespace create OAUTH_SESSION   # paste id into wrangler.jsonc
+wrangler kv namespace create OAUTH_STATE     # paste id into wrangler.jsonc
+wrangler secret put SESSION_SECRET           # ≥32 random chars
+```
+
+Dev uses `.dev.vars` (gitignored) for `SESSION_SECRET` and miniflare-simulated KV.
 
 ### Pre-launch / launch day (June 27–28, 2026)
 
@@ -53,7 +72,8 @@ matchups (slot labels for each match are right there in `MATCHES`), then deploy.
 | `src/lib/tournament/data.ts` | Static truth: 48 teams, FIFA matches 73–104, venues/dates |
 | `src/lib/bracket/derive.ts` | Pure picks→bracket pipeline (kept-if-valid invalidation) |
 | `src/lib/bracket/schema.ts` | Zod schema for the `blue.bracket.wc2026` record |
-| `src/lib/atproto/` | Identity resolution, PDS reads, OAuth boundary, publish |
+| `src/lib/atproto/` | Identity resolution, public PDS reads |
+| `src/server/` | OAuth client + KV stores, signed session cookie, auth/publish server fns, UFOs stats |
 | `src/lib/og/render.tsx` | takumi template for `/b/$handle/og.png` (1200×630) |
 | `src/routes/b.$handle.tsx` | SSR share page with OG meta |
 | `lexicons/blue.bracket.wc2026.json` | Lexicon doc (documentation; runtime uses Zod) |

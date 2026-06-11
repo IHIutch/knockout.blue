@@ -2,9 +2,13 @@ import { LogOut } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../hooks/useAuth'
 
-/** Sign-in affordance: inline handle form (atproto OAuth needs the user's handle to find their auth server). */
+/**
+ * Sign-in affordance. Primary path is one-click "Sign in with Bluesky"
+ * (no handle needed — bsky.social's login page identifies the user);
+ * self-hosters can expand a field accepting a handle, DID, or PDS URL.
+ */
 export function AuthButton({
-  label = 'Sign in',
+  label = 'Sign in with Bluesky',
   panelDirection = 'down',
 }: {
   label?: string
@@ -13,6 +17,7 @@ export function AuthButton({
 }) {
   const { state, signIn, signOut } = useAuth()
   const [open, setOpen] = useState(false)
+  const [showCustom, setShowCustom] = useState(false)
   const [identifier, setIdentifier] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,16 +43,20 @@ export function AuthButton({
     )
   }
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault()
+  const start = async (id: string | null) => {
     setBusy(true)
     setError(null)
     try {
-      await signIn(identifier)
+      await signIn(id)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start sign-in.')
       setBusy(false)
     }
+  }
+
+  const submitCustom = (event: FormEvent) => {
+    event.preventDefault()
+    void start(identifier)
   }
 
   return (
@@ -60,35 +69,56 @@ export function AuthButton({
         {label}
       </button>
       {open && (
-        <form
-          onSubmit={submit}
+        <div
           className={`absolute right-0 z-30 w-72 rounded-xl border border-zinc-800 bg-zinc-900 p-3 shadow-xl ${
             panelDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
           }`}
         >
-          <label htmlFor="auth-handle" className="mb-1.5 block text-xs font-medium text-zinc-400">
-            Your Bluesky handle
-          </label>
-          <input
-            id="auth-handle"
-            autoFocus
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            placeholder="you.bsky.social"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none"
-          />
-          {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
           <button
-            type="submit"
-            disabled={busy || identifier.trim().length === 0}
-            className="mt-2 w-full rounded-lg bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-sky-500 disabled:opacity-50"
+            type="button"
+            disabled={busy}
+            onClick={() => void start(null)}
+            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-500 disabled:opacity-50"
           >
-            {busy ? 'Redirecting…' : 'Continue'}
+            {busy ? 'Redirecting…' : '🦋 Sign in with Bluesky'}
           </button>
-        </form>
+
+          {!showCustom ? (
+            <button
+              type="button"
+              onClick={() => setShowCustom(true)}
+              className="mt-2 w-full text-center text-xs text-zinc-500 underline-offset-2 hover:text-zinc-300 hover:underline"
+            >
+              Use a handle or self-hosted PDS instead
+            </button>
+          ) : (
+            <form onSubmit={submitCustom} className="mt-3 border-t border-zinc-800 pt-3">
+              <label htmlFor="auth-handle" className="mb-1.5 block text-xs font-medium text-zinc-400">
+                Handle, DID, or PDS URL
+              </label>
+              <input
+                id="auth-handle"
+                autoFocus
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="you.bsky.social"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={busy || identifier.trim().length === 0}
+                className="mt-2 w-full rounded-lg border border-sky-700 px-3 py-1.5 text-sm font-medium text-sky-300 transition-colors hover:bg-sky-950 disabled:opacity-50"
+              >
+                Continue
+              </button>
+            </form>
+          )}
+
+          {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+        </div>
       )}
     </div>
   )

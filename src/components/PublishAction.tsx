@@ -3,8 +3,7 @@ import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import type { WinnersMap } from '../lib/bracket/schema'
-import { publishBracket } from '../lib/atproto/publish'
-import { ACTIVE_FIELD } from '../lib/tournament/field'
+import { publishBracket } from '../server/auth'
 import { AuthButton } from './AuthButton'
 
 /** The right side of the PublishBar: sign-in prompt → publish → share link. */
@@ -14,14 +13,16 @@ export function PublishAction({ winners, picksMade }: { winners: WinnersMap; pic
   const [copied, setCopied] = useState(false)
 
   if (state.status === 'loading') return null
-  if (state.status === 'anonymous') return <AuthButton label="Sign in to publish" panelDirection="up" />
+  if (state.status === 'anonymous') {
+    return <AuthButton label="Sign in to publish" panelDirection="up" />
+  }
 
   const shareUrl = `${window.location.origin}/b/${state.handle}`
 
   const publish = async () => {
     setPhase('publishing')
     try {
-      await publishBracket(state.agent, winners, ACTIVE_FIELD)
+      await publishBracket({ data: winners })
       setPhase('done')
     } catch {
       setPhase('error')
