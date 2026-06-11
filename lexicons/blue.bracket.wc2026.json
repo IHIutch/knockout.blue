@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "blue.bracket.wc2026",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user's 2026 FIFA World Cup knockout-stage bracket predictions. One per account (rkey 'self'). Keys of `winners` are official FIFA match numbers 73–104; values are FIFA three-letter codes of the picked winner. Picks may be partial; consumers should treat picks that are inconsistent with upstream picks as absent.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["schemaVersion", "winners", "createdAt", "updatedAt"],
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "description": "Record shape version. Currently 1.",
+            "const": 1
+          },
+          "winners": {
+            "type": "object",
+            "description": "Map of FIFA match number (\"73\"–\"104\") to the picked winner's FIFA three-letter team code."
+          },
+          "createdAt": { "type": "string", "format": "datetime" },
+          "updatedAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  }
+}
