@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Bracket } from '../components/Bracket'
 import { EditorToolbar } from '../components/EditorToolbar'
+import { PublishAction } from '../components/PublishAction'
 import { PublishBar } from '../components/PublishBar'
 import { useBracketDraft } from '../hooks/useBracketDraft'
 import { PICKS_ARE_OPEN } from '../lib/tournament/field'
@@ -35,7 +36,14 @@ function Editor() {
 
       <Bracket derived={draft.derived} interactive={PICKS_ARE_OPEN} onPick={draft.pick} />
 
-      <PublishBar derived={draft.derived} />
+      <PublishBar
+        derived={draft.derived}
+        action={
+          draft.hydrated ? (
+            <PublishAction winners={draft.winners} picksMade={draft.derived.completeness.picked} />
+          ) : null
+        }
+      />
     </main>
   )
 }

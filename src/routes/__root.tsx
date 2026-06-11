@@ -2,7 +2,9 @@ import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-r
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
+import { AuthButton } from '../components/AuthButton'
 import { Header } from '../components/Header'
+import { AuthProvider } from '../hooks/useAuth'
 import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({
@@ -26,10 +28,12 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <>
-      <Header />
+    <AuthProvider>
+      <Header>
+        <AuthButton />
+      </Header>
       <Outlet />
-    </>
+    </AuthProvider>
   )
 }
 
