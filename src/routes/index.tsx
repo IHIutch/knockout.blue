@@ -1,14 +1,41 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Bracket } from '../components/Bracket'
+import { EditorToolbar } from '../components/EditorToolbar'
+import { PublishBar } from '../components/PublishBar'
+import { useBracketDraft } from '../hooks/useBracketDraft'
+import { PICKS_ARE_OPEN } from '../lib/tournament/field'
 
-export const Route = createFileRoute('/')({ component: Home })
+export const Route = createFileRoute('/')({ component: Editor })
 
-function Home() {
+function Editor() {
+  const draft = useBracketDraft()
+  const hasPicks = Object.keys(draft.winners).length > 0
+
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
-    </div>
+    <main className="mx-auto max-w-7xl px-4 pb-28">
+      <section className="flex flex-wrap items-end justify-between gap-3 py-5">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Call the knockout rounds</h1>
+          <p className="mt-1 max-w-xl text-sm text-zinc-400">
+            Pick every winner from the Round of 32 to the Final. Your bracket lives in your own AT
+            Protocol account — sign in with Bluesky to publish and share it.
+          </p>
+        </div>
+        {PICKS_ARE_OPEN && (
+          <EditorToolbar onAutopick={draft.runAutopick} onClear={draft.clear} hasPicks={hasPicks} />
+        )}
+      </section>
+
+      {!PICKS_ARE_OPEN && (
+        <div className="mb-4 rounded-xl border border-sky-900/60 bg-sky-950/40 px-4 py-3 text-sm text-sky-200">
+          The group stage wraps up June 27 — picks open when the Round of 32 field is set on{' '}
+          <span className="font-semibold">June 28</span>. Here&apos;s the bracket so far.
+        </div>
+      )}
+
+      <Bracket derived={draft.derived} interactive={PICKS_ARE_OPEN} onPick={draft.pick} />
+
+      <PublishBar derived={draft.derived} />
+    </main>
   )
 }
