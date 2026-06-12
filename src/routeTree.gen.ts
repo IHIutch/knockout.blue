@@ -9,19 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as BracketRouteImport } from './routes/bracket'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GroupsIndexRouteImport } from './routes/groups.index'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
+import { Route as GroupsThirdsRouteImport } from './routes/groups.thirds'
+import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as BHandleRouteImport } from './routes/b.$handle'
 import { Route as BHandleOgDotpngRouteImport } from './routes/b.$handle.og[.]png'
 
+const BracketRoute = BracketRouteImport.update({
+  id: '/bracket',
+  path: '/bracket',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GroupsIndexRoute = GroupsIndexRouteImport.update({
+  id: '/groups/',
+  path: '/groups/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OauthCallbackRoute = OauthCallbackRouteImport.update({
   id: '/oauth/callback',
   path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupsThirdsRoute = GroupsThirdsRouteImport.update({
+  id: '/groups/thirds',
+  path: '/groups/thirds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupsGroupIdRoute = GroupsGroupIdRouteImport.update({
+  id: '/groups/$groupId',
+  path: '/groups/$groupId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BHandleRoute = BHandleRouteImport.update({
@@ -37,39 +61,87 @@ const BHandleOgDotpngRoute = BHandleOgDotpngRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bracket': typeof BracketRoute
   '/b/$handle': typeof BHandleRouteWithChildren
+  '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/groups/thirds': typeof GroupsThirdsRoute
   '/oauth/callback': typeof OauthCallbackRoute
+  '/groups/': typeof GroupsIndexRoute
   '/b/$handle/og.png': typeof BHandleOgDotpngRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bracket': typeof BracketRoute
   '/b/$handle': typeof BHandleRouteWithChildren
+  '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/groups/thirds': typeof GroupsThirdsRoute
   '/oauth/callback': typeof OauthCallbackRoute
+  '/groups': typeof GroupsIndexRoute
   '/b/$handle/og.png': typeof BHandleOgDotpngRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bracket': typeof BracketRoute
   '/b/$handle': typeof BHandleRouteWithChildren
+  '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/groups/thirds': typeof GroupsThirdsRoute
   '/oauth/callback': typeof OauthCallbackRoute
+  '/groups/': typeof GroupsIndexRoute
   '/b/$handle/og.png': typeof BHandleOgDotpngRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/b/$handle' | '/oauth/callback' | '/b/$handle/og.png'
+  fullPaths:
+    | '/'
+    | '/bracket'
+    | '/b/$handle'
+    | '/groups/$groupId'
+    | '/groups/thirds'
+    | '/oauth/callback'
+    | '/groups/'
+    | '/b/$handle/og.png'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/b/$handle' | '/oauth/callback' | '/b/$handle/og.png'
-  id: '__root__' | '/' | '/b/$handle' | '/oauth/callback' | '/b/$handle/og.png'
+  to:
+    | '/'
+    | '/bracket'
+    | '/b/$handle'
+    | '/groups/$groupId'
+    | '/groups/thirds'
+    | '/oauth/callback'
+    | '/groups'
+    | '/b/$handle/og.png'
+  id:
+    | '__root__'
+    | '/'
+    | '/bracket'
+    | '/b/$handle'
+    | '/groups/$groupId'
+    | '/groups/thirds'
+    | '/oauth/callback'
+    | '/groups/'
+    | '/b/$handle/og.png'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BracketRoute: typeof BracketRoute
   BHandleRoute: typeof BHandleRouteWithChildren
+  GroupsGroupIdRoute: typeof GroupsGroupIdRoute
+  GroupsThirdsRoute: typeof GroupsThirdsRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
+  GroupsIndexRoute: typeof GroupsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/bracket': {
+      id: '/bracket'
+      path: '/bracket'
+      fullPath: '/bracket'
+      preLoaderRoute: typeof BracketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -77,11 +149,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/groups/': {
+      id: '/groups/'
+      path: '/groups'
+      fullPath: '/groups/'
+      preLoaderRoute: typeof GroupsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/oauth/callback': {
       id: '/oauth/callback'
       path: '/oauth/callback'
       fullPath: '/oauth/callback'
       preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/thirds': {
+      id: '/groups/thirds'
+      path: '/groups/thirds'
+      fullPath: '/groups/thirds'
+      preLoaderRoute: typeof GroupsThirdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/$groupId': {
+      id: '/groups/$groupId'
+      path: '/groups/$groupId'
+      fullPath: '/groups/$groupId'
+      preLoaderRoute: typeof GroupsGroupIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/b/$handle': {
@@ -114,8 +207,12 @@ const BHandleRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BracketRoute: BracketRoute,
   BHandleRoute: BHandleRouteWithChildren,
+  GroupsGroupIdRoute: GroupsGroupIdRoute,
+  GroupsThirdsRoute: GroupsThirdsRoute,
   OauthCallbackRoute: OauthCallbackRoute,
+  GroupsIndexRoute: GroupsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

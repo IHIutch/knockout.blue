@@ -6,9 +6,9 @@ import { sessionSetCookieHeader } from './session-cookie'
 
 /**
  * Handle the OAuth redirect (response_mode=query): exchange the code, set
- * the signed session cookie, bounce home. Errors land on / with a query
- * param the editor shows as a banner. Server-only module — the callback
- * route loads it via dynamic import inside its GET handler.
+ * the signed session cookie, bounce to the editor. Errors land on /bracket
+ * with a query param the editor shows as a banner. Server-only module — the
+ * callback route loads it via dynamic import inside its GET handler.
  */
 export async function handleOAuthCallback(request: Request): Promise<Response> {
   const params = new URL(request.url).searchParams
@@ -19,7 +19,7 @@ export async function handleOAuthCallback(request: Request): Promise<Response> {
     return new Response(null, {
       status: 302,
       headers: {
-        'Location': '/',
+        'Location': '/bracket',
         'Set-Cookie': await sessionSetCookieHeader(user),
       },
     })
@@ -27,7 +27,7 @@ export async function handleOAuthCallback(request: Request): Promise<Response> {
   catch (err) {
     const message
       = params.get('error_description') ?? (err instanceof Error ? err.message : 'Sign-in failed')
-    const to = new URL('/', request.url)
+    const to = new URL('/bracket', request.url)
     to.searchParams.set('authError', message)
     return new Response(null, { status: 302, headers: { Location: to.toString() } })
   }

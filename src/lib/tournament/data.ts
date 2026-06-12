@@ -2,15 +2,18 @@
  * Static tournament truth for the 2026 FIFA World Cup knockout stage.
  *
  * Matches are identified by their official FIFA match numbers (73–104).
- * The 16 Round-of-32 participant pairs are unknown until the group stage
- * ends on June 27, 2026 — until then R32 slots carry `team: null` plus a
- * human-readable source label (e.g. "1A", "3rd C/E/F/H/I"). Filling in the
- * real teams on June 27–28 is a one-commit change to R32_TEAMS below.
+ * There is no global Round-of-32 field: every bracket derives its own from
+ * that user's group-stage predictions (see groupStage.ts), and it stays
+ * theirs for the whole tournament — real results never replace it. R32
+ * slots carry FIFA's source notation ("1A", "3rd C/E/F/H/I") for display
+ * while a prediction is incomplete.
  */
 
 export type GroupId
   = | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
     | 'G' | 'H' | 'I' | 'J' | 'K' | 'L'
+
+export const GROUP_IDS: GroupId[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
 export type TeamCode
   // Group A
@@ -112,6 +115,11 @@ export const TEAMS: Record<TeamCode, Team> = {
 
 export const TEAM_CODES = Object.keys(TEAMS) as TeamCode[]
 
+/** The four teams of a group, in the fixed order they appear in TEAMS. */
+export function teamsInGroup(group: GroupId): Team[] {
+  return Object.values(TEAMS).filter(team => team.group === group)
+}
+
 /** Official FIFA knockout match numbers. */
 export const MATCH_NUMBERS = Array.from({ length: 32 }, (_, i) => 73 + i)
 
@@ -210,17 +218,3 @@ export const MATCHES: Record<number, MatchInfo> = Object.fromEntries(
 
 /** The two teams contesting an R32 match (73–88). */
 export type R32Field = Record<number, { home: TeamCode | null, away: TeamCode | null }>
-
-/**
- * The real Round-of-32 field. All null until the group stage ends on
- * June 27, 2026 — updating this object with the 16 actual matchups is the
- * launch trigger (one reviewed commit, nothing else changes).
- */
-export const LIVE_R32_FIELD: R32Field = Object.fromEntries(
-  R32_MATCH_NUMBERS.map(n => [n, { home: null, away: null }]),
-)
-
-/** True once the live R32 field has been filled in (post group stage). */
-export const R32_FIELD_IS_SET = Object.values(LIVE_R32_FIELD).every(
-  slot => slot.home !== null && slot.away !== null,
-)

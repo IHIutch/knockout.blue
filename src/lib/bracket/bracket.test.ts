@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import type { WinnersMap } from './schema'
 
 import {
-  LIVE_R32_FIELD,
   MATCH_NUMBERS,
   MATCHES,
   R32_MATCH_NUMBERS,
@@ -11,6 +10,7 @@ import {
   TEAMS,
 } from '../tournament/data'
 import { DEV_R32_FIELD } from '../tournament/fixture.dev'
+import { deriveFieldFromGroupPicks } from '../tournament/groupStage'
 import { autopick } from './autopick'
 import { deriveBracket, pruneInvalidPicks } from './derive'
 import { BRACKET_NSID } from './nsid'
@@ -92,8 +92,8 @@ describe('deriveBracket', () => {
     expect(result.champion).toBeNull()
   })
 
-  it('with the unset live field, nothing is pickable', () => {
-    const result = deriveBracket({}, LIVE_R32_FIELD)
+  it('with no group predictions, nothing is pickable', () => {
+    const result = deriveBracket({}, deriveFieldFromGroupPicks({}, []))
     expect(result.completeness.pickable).toBe(0)
   })
 
@@ -166,7 +166,7 @@ describe('autopick', () => {
     expect(result.champion).not.toBeNull()
   })
 
-  it('does nothing when the field is unset', () => {
-    expect(autopick({}, LIVE_R32_FIELD, 'chalk')).toEqual({})
+  it('does nothing when the field is empty', () => {
+    expect(autopick({}, deriveFieldFromGroupPicks({}, []), 'chalk')).toEqual({})
   })
 })

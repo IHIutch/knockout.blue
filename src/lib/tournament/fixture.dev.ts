@@ -1,11 +1,12 @@
 import type { R32Field } from './data'
 
 /**
- * A plausible Round-of-32 field for development before the real one is
- * known (June 27, 2026). Group winners/runners-up are seeded by ranking;
- * the eight third-place teams are assigned to slots respecting each slot's
+ * A plausible, fully-populated Round-of-32 field used only as a test
+ * fixture (the app itself derives every field from a user's group
+ * predictions). Group winners/runners-up are seeded by ranking; the eight
+ * third-place teams are assigned to slots respecting each slot's
  * five-group candidate constraint (74→3D, 77→3G, 79→3C, 80→3H, 81→3F,
- * 82→3E, 85→3I, 87→3J). Never ship this as live data.
+ * 82→3E, 85→3I, 87→3J).
  */
 export const DEV_R32_FIELD: R32Field = {
   73: { home: 'KOR', away: 'CAN' }, // 2A v 2B

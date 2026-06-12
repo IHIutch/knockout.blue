@@ -4,13 +4,26 @@ import type { Did } from '@atcute/lexicons/syntax'
 import { Client, ok } from '@atcute/client'
 import { isActorIdentifier } from '@atcute/lexicons/syntax'
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 
 import type { SessionUser } from './session-cookie'
 
 import { pruneInvalidPicks } from '../lib/bracket/derive'
 import { BRACKET_NSID } from '../lib/bracket/nsid'
-import { bracketRecordSchema, buildRecord, winnersSchema } from '../lib/bracket/schema'
-import { ACTIVE_FIELD } from '../lib/tournament/field'
+import {
+  advancingThirdsSchema,
+  bracketRecordSchema,
+  buildRecord,
+  groupPicksSchema,
+  winnersSchema,
+} from '../lib/bracket/schema'
+import { deriveFieldFromGroupPicks } from '../lib/tournament/groupStage'
+
+const publishInputSchema = z.object({
+  winners: winnersSchema,
+  groupPicks: groupPicksSchema,
+  thirds: advancingThirdsSchema,
+})
 
 const BSKY_PDS = 'https://bsky.social'
 
@@ -73,13 +86,13 @@ export const logout = createServerFn({ method: 'POST' }).handler(async () => {
 })
 
 /**
- * Publish the caller's bracket to their PDS. The winners map is validated
- * at the server boundary; invalid picks are pruned; createdAt survives
- * republishing.
+ * Publish the caller's bracket to their PDS. Validated at the server
+ * boundary; winners that aren't reachable from the caller's own predicted
+ * field are pruned; createdAt survives republishing.
  */
 export const publishBracket = createServerFn({ method: 'POST' })
-  .validator(winnersSchema)
-  .handler(async ({ data: winners }) => {
+  .validator(publishInputSchema)
+  .handler(async ({ data }) => {
     const { readSessionCookie } = await import('./session-cookie')
     const { getOAuthClient } = await import('./oauth-client')
 
@@ -101,10 +114,11 @@ export const publishBracket = createServerFn({ method: 'POST' })
         createdAt = parsed.data.createdAt
     }
 
-    const record = buildRecord(pruneInvalidPicks(winners, ACTIVE_FIELD), {
-      createdAt,
-      updatedAt: now,
-    })
+    const field = deriveFieldFromGroupPicks(data.groupPicks, data.thirds)
+    const record = buildRecord(
+      { ...data, winners: pruneInvalidPicks(data.winners, field) },
+      { createdAt, updatedAt: now },
+    )
 
     await ok(
       rpc.post('com.atproto.repo.putRecord', {

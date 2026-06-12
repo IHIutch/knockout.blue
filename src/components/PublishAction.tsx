@@ -1,14 +1,14 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
-import type { WinnersMap } from '../lib/bracket/schema'
+import type { BracketData } from '../lib/bracket/schema'
 
 import { useAuth } from '../hooks/useAuth'
 import { publishBracket } from '../server/auth'
 import { AuthButton } from './AuthButton'
 
 /** The right side of the PublishBar: sign-in prompt → publish → share link. */
-export function PublishAction({ winners, picksMade }: { winners: WinnersMap, picksMade: number }) {
+export function PublishAction({ data, picksMade }: { data: BracketData, picksMade: number }) {
   const { state } = useAuth()
   const [phase, setPhase] = useState<'idle' | 'publishing' | 'done' | 'error'>('idle')
   const [copied, setCopied] = useState(false)
@@ -24,7 +24,7 @@ export function PublishAction({ winners, picksMade }: { winners: WinnersMap, pic
   const publish = async () => {
     setPhase('publishing')
     try {
-      await publishBracket({ data: winners })
+      await publishBracket({ data })
       setPhase('done')
     }
     catch {
