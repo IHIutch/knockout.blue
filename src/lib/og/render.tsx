@@ -201,7 +201,10 @@ export function BracketImage({ handle, derived }: { handle: string; derived: Res
 
 const imageCache = new Map<string, ArrayBuffer>()
 
-const IMAGE_FORMAT = 'webp' as const
+// PNG at the canonical 1200×630 (1x): universal social-scraper support
+// (incl. Facebook/LinkedIn) and crisp text. Platforms display OG cards at
+// this size, so a higher DPR adds bytes without visible benefit.
+const IMAGE_FORMAT = 'png' as const
 
 /** Content-Type matching IMAGE_FORMAT, for the og image route to serve. */
 export const IMAGE_CONTENT_TYPE = `image/${IMAGE_FORMAT}`
@@ -210,12 +213,10 @@ export async function renderBracketImage(
   handle: string,
   derived: ResolvedBracket,
 ): Promise<Uint8Array> {
-  const devicePixelRatio = 2.0;
   return render(<BracketImage handle={handle} derived={derived} />, {
-    width: 1200 * devicePixelRatio,
-    height: 630 * devicePixelRatio,
+    width: 1200,
+    height: 630,
     format: IMAGE_FORMAT,
-    devicePixelRatio,
     resourcesOptions: { cache: imageCache },
   })
 }
