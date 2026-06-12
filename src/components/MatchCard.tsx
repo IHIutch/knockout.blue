@@ -104,6 +104,7 @@ export function MatchCard({
           {formatMatchDate(info.date)}
           {' '}
           ·
+          {' '}
           {venueShort}
         </span>
       </div>

@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 
 import type { WinnersMap } from '../lib/bracket/schema'
@@ -17,7 +16,7 @@ export function PublishAction({ winners, picksMade }: { winners: WinnersMap, pic
   if (state.status === 'loading')
     return null
   if (state.status === 'anonymous') {
-    return <AuthButton label="Sign in to publish" panelDirection="up" />
+    return <AuthButton label="Sign in to publish" errorDirection="up" />
   }
 
   const shareUrl = `${window.location.origin}/b/${state.handle}`
@@ -54,7 +53,10 @@ export function PublishAction({ winners, picksMade }: { winners: WinnersMap, pic
           onClick={() => void copy()}
           className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-sky-500"
         >
-          {copied ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+          <span
+            className={`size-3.5 ${copied ? 'icon-[lucide--check]' : 'icon-[lucide--copy]'}`}
+            aria-hidden
+          />
           {copied ? 'Copied' : 'Copy link'}
         </button>
         <button

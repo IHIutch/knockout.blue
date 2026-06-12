@@ -1,5 +1,3 @@
-import { Dices, Eraser, Wand2 } from 'lucide-react'
-
 import type { AutopickMode } from '../lib/bracket/autopick'
 
 const buttonClass
@@ -17,11 +15,11 @@ export function EditorToolbar({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <button type="button" className={buttonClass} onClick={() => onAutopick('chalk')}>
-        <Wand2 className="size-3.5" aria-hidden />
+        <span className="icon-[lucide--wand-2] size-3.5" aria-hidden />
         Autopick favorites
       </button>
       <button type="button" className={buttonClass} onClick={() => onAutopick('chaos')}>
-        <Dices className="size-3.5" aria-hidden />
+        <span className="icon-[lucide--dices] size-3.5" aria-hidden />
         Autopick chaos
       </button>
       {hasPicks && (
@@ -30,7 +28,7 @@ export function EditorToolbar({
           className={`${buttonClass} text-zinc-400 hover:border-red-900 hover:text-red-300`}
           onClick={onClear}
         >
-          <Eraser className="size-3.5" aria-hidden />
+          <span className="icon-[lucide--eraser] size-3.5" aria-hidden />
           Clear all
         </button>
       )}

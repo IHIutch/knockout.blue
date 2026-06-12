@@ -1,27 +1,21 @@
-import type { FormEvent } from 'react'
-
-import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAuth } from '../hooks/useAuth'
 
 /**
- * Sign-in affordance. Primary path is one-click "Sign in with Bluesky"
- * (no handle needed — bsky.social's login page identifies the user);
- * self-hosters can expand a field accepting a handle, DID, or PDS URL.
+ * One-click "Sign in with Bluesky": the button starts the OAuth flow
+ * directly — bsky.social's own login page identifies the user, so no handle
+ * is needed here. Used in the header and the publish bar.
  */
 export function AuthButton({
   label = 'Sign in with Bluesky',
-  panelDirection = 'down',
+  errorDirection = 'down',
 }: {
   label?: string
-  /** 'up' for triggers in the bottom-fixed publish bar. */
-  panelDirection?: 'down' | 'up'
+  /** 'up' renders the error above the button (for the bottom-fixed publish bar). */
+  errorDirection?: 'down' | 'up'
 }) {
   const { state, signIn, signOut } = useAuth()
-  const [open, setOpen] = useState(false)
-  const [showCustom, setShowCustom] = useState(false)
-  const [identifier, setIdentifier] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,18 +36,18 @@ export function AuthButton({
           title="Sign out"
           className="rounded-lg border border-zinc-800 p-1.5 text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-200"
         >
-          <LogOut className="size-3.5" aria-hidden />
+          <span className="icon-[lucide--log-out] size-3.5" aria-hidden />
           <span className="sr-only">Sign out</span>
         </button>
       </div>
     )
   }
 
-  const start = async (id: string | null) => {
+  const signInWithBluesky = async () => {
     setBusy(true)
     setError(null)
     try {
-      await signIn(id)
+      await signIn(null)
     }
     catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start sign-in.')
@@ -61,73 +55,33 @@ export function AuthButton({
     }
   }
 
-  const submitCustom = (event: FormEvent) => {
-    event.preventDefault()
-    void start(identifier)
-  }
-
   return (
     <div className="relative">
       <button
         type="button"
-        onClick={() => setOpen(v => !v)}
-        className="rounded-lg bg-sky-600 px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-sky-500"
+        disabled={busy}
+        onClick={() => void signInWithBluesky()}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-sky-600 px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-sky-500 disabled:opacity-50"
       >
-        {label}
+        {busy
+          ? (
+              'Redirecting…'
+            )
+          : (
+              <>
+                <span className="icon-[simple-icons--bluesky] size-4" aria-hidden />
+                {label}
+              </>
+            )}
       </button>
-      {open && (
-        <div
-          className={`absolute right-0 z-30 w-72 rounded-xl border border-zinc-800 bg-zinc-900 p-3 shadow-xl ${
-            panelDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
+      {error && (
+        <p
+          className={`absolute right-0 w-56 text-xs text-red-400 ${
+            errorDirection === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'
           }`}
         >
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void start(null)}
-            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-500 disabled:opacity-50"
-          >
-            {busy ? 'Redirecting…' : '🦋 Sign in with Bluesky'}
-          </button>
-
-          {!showCustom
-            ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCustom(true)}
-                  className="mt-2 w-full text-center text-xs text-zinc-500 underline-offset-2 hover:text-zinc-300 hover:underline"
-                >
-                  Use a handle or self-hosted PDS instead
-                </button>
-              )
-            : (
-                <form onSubmit={submitCustom} className="mt-3 border-t border-zinc-800 pt-3">
-                  <label htmlFor="auth-handle" className="mb-1.5 block text-xs font-medium text-zinc-400">
-                    Handle, DID, or PDS URL
-                  </label>
-                  <input
-                    id="auth-handle"
-                    autoFocus
-                    value={identifier}
-                    onChange={e => setIdentifier(e.target.value)}
-                    placeholder="you.bsky.social"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={busy || identifier.trim().length === 0}
-                    className="mt-2 w-full rounded-lg border border-sky-700 px-3 py-1.5 text-sm font-medium text-sky-300 transition-colors hover:bg-sky-950 disabled:opacity-50"
-                  >
-                    Continue
-                  </button>
-                </form>
-              )}
-
-          {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
-        </div>
+          {error}
+        </p>
       )}
     </div>
   )
