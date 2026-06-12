@@ -10,9 +10,11 @@ import { defineConfig } from 'vite'
 const DEV_ORIGIN = 'http://127.0.0.1:3000'
 const PROD_ORIGIN = 'https://knockout.blue'
 // Granular scope: consent screen grants write access ONLY to our record
-// collection, not the whole account (string built by @atcute/oauth-types
-// scope.repo({ collection: ['blue.knockout.wc2026'] })).
-const OAUTH_SCOPE = 'atproto repo?collection=blue.knockout.wc2026'
+// collection (with explicit create/update/delete actions — the no-action form
+// is not treated as "all actions" by the PDS), not the whole account. Built by
+// @atcute/oauth-types scope.repo({ collection, action }).
+const OAUTH_SCOPE
+  = 'atproto repo?collection=blue.knockout.wc2026&action=create&action=update&action=delete'
 
 const config = defineConfig(({ command }) => {
   const dev = command === 'serve'

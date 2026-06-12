@@ -28,7 +28,7 @@ npm run deploy   # build + wrangler deploy (requires `wrangler login`)
   (public client — no JWKs). Tokens live in Cloudflare KV (`OAUTH_SESSION`/`OAUTH_STATE`
   bindings, simulated locally); the browser only holds an HMAC-signed HTTP-only cookie
   with `{ did, handle }`. PDS writes happen in `src/server/auth.ts` server functions.
-- **Granular scope**: `atproto repo?collection=blue.knockout.wc2026` — consent grants
+- **Granular scope**: `atproto repo?collection=blue.knockout.wc2026&action=create&action=update&action=delete` — consent grants
   write access to our record collection only, not the whole account.
 - **Sign-in UX**: one-click "Sign in with Bluesky" authorizes against `https://bsky.social`
   with no handle needed (the PDS identifies the user, and offers account creation);

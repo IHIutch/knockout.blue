@@ -4,7 +4,7 @@
   "client_uri": "https://knockout.blue",
   "logo_uri": "https://knockout.blue/logo192.png",
   "redirect_uris": ["https://knockout.blue/oauth/callback"],
-  "scope": "atproto repo?collection=blue.knockout.wc2026",
+  "scope": "atproto repo?collection=blue.knockout.wc2026&action=create&action=update&action=delete",
   "grant_types": ["authorization_code", "refresh_token"],
   "response_types": ["code"],
   "token_endpoint_auth_method": "none",
