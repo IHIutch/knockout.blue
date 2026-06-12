@@ -3,24 +3,36 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Bracket } from '../components/Bracket'
 import { Flag } from '../components/Flag'
 import { getBracketForActor } from '../lib/atproto/readBracket'
+import { autopick } from '../lib/bracket/autopick'
 import { deriveBracket } from '../lib/bracket/derive'
 import { TEAMS } from '../lib/tournament/data'
 import { ACTIVE_FIELD } from '../lib/tournament/field'
+import { DEV_R32_FIELD } from '../lib/tournament/fixture.dev'
 
 export const Route = createFileRoute('/b/$handle')({
+  // ?demo swaps in a fully chalk-picked bracket (page, meta, and og:image
+  // alike) so the filled-out social card can be previewed before any real
+  // picks are published.
+  validateSearch: (search: Record<string, unknown>): { demo?: true } =>
+    'demo' in search ? { demo: true } : {},
   loader: ({ params }) => getBracketForActor({ data: params.handle }),
-  head: ({ loaderData }) => {
+  head: ({ loaderData, match }) => {
     if (!loaderData || loaderData.status !== 'ok') {
       return { meta: [{ title: 'Bracket not found — knockout.blue' }] }
     }
-    const derived = deriveBracket(loaderData.record.winners, ACTIVE_FIELD)
+    const demo = match.search.demo === true
+    // Demo uses the dev fixture field — the live field is empty pre-June 27,
+    // and chalk picks over an empty field would preview an empty bracket.
+    const field = demo ? DEV_R32_FIELD : ACTIVE_FIELD
+    const winners = demo ? autopick({}, field, 'chalk') : loaderData.record.winners
+    const derived = deriveBracket(winners, field)
     const champion = derived.champion ? TEAMS[derived.champion] : null
     const title = `@${loaderData.handle}'s World Cup 2026 bracket`
     const description = champion
       ? `Champion pick: ${champion.name} · ${derived.completeness.picked}/${derived.completeness.total} picks`
       : `${derived.completeness.picked}/${derived.completeness.total} picks made`
     // Absolute URL required by OG crawlers; production origin is what matters to them.
-    const ogImage = `https://knockout.blue/b/${loaderData.handle}/og.png`
+    const ogImage = `https://knockout.blue/b/${loaderData.handle}/og.png${demo ? '?demo' : ''}`
     return {
       meta: [
         { title: `${title} — knockout.blue` },
@@ -43,6 +55,7 @@ export const Route = createFileRoute('/b/$handle')({
 // eslint-disable-next-line react-refresh/only-export-components
 function SharePage() {
   const lookup = Route.useLoaderData()
+  const { demo } = Route.useSearch()
 
   if (lookup.status !== 'ok') {
     const message = {
@@ -66,7 +79,9 @@ function SharePage() {
     )
   }
 
-  const derived = deriveBracket(lookup.record.winners, ACTIVE_FIELD)
+  const field = demo ? DEV_R32_FIELD : ACTIVE_FIELD
+  const winners = demo ? autopick({}, field, 'chalk') : lookup.record.winners
+  const derived = deriveBracket(winners, field)
   const champion = derived.champion ? TEAMS[derived.champion] : null
 
   return (
