@@ -9,7 +9,7 @@ import { env } from './env'
  * integrity here is load-bearing.
  */
 
-const COOKIE_NAME = 'bb_session'
+const COOKIE_NAME = 'kb_session'
 const MAX_AGE = 60 * 60 * 24 * 60 // 60 days; PDS refresh-token lifetime is the real ceiling
 
 export interface SessionUser {

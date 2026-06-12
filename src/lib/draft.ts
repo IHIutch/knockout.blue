@@ -2,7 +2,7 @@ import type { WinnersMap } from './bracket/schema'
 
 import { winnersSchema } from './bracket/schema'
 
-const KEY = 'bracketblue:draft:v1'
+const KEY = 'knockoutblue:draft:v1'
 
 /** Client-only. Returns an empty draft on the server, missing key, or bad data. */
 export function loadDraft(): WinnersMap {

@@ -178,8 +178,8 @@ export function BracketImage({ handle, derived }: { handle: string, derived: Res
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 24, fontWeight: 800, color: '#fafafa' }}>bracket</span>
+        <div style={{ display: 'flex', alignItems: 'start' }}>
+          <span style={{ fontSize: 24, fontWeight: 800, color: '#fafafa' }}>knockout</span>
           <span style={{ fontSize: 24, fontWeight: 800, color: colors.accent }}>.blue</span>
         </div>
         <span style={{ fontSize: 15, fontWeight: 600, color: colors.dim }}>

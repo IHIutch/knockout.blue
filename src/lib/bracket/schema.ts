@@ -19,7 +19,7 @@ export const winnersSchema = z.partialRecord(matchKeySchema, teamCodeSchema)
 export type WinnersMap = z.infer<typeof winnersSchema>
 
 /**
- * The `blue.bracket.wc2026` record as stored in a user's PDS (rkey "self").
+ * The `blue.knockout.wc2026` record as stored in a user's PDS (rkey "self").
  *
  * Records read from the network are untrusted — anyone can write arbitrary
  * JSON into this collection — so every read goes through `safeParse`.

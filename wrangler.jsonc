@@ -1,14 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "bracket-blue",
+  "name": "knockout-blue",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
-  "routes": [{ "pattern": "bracket.blue", "custom_domain": true }],
-  // KV ids are placeholders until `wrangler kv namespace create` (see README).
-  // Local dev simulates these bindings automatically.
+  "routes": [{ "pattern": "knockout.blue", "custom_domain": true }],
+  // Local dev simulates these bindings automatically (miniflare).
   "kv_namespaces": [
-    { "binding": "OAUTH_SESSION", "id": "REPLACE_WITH_OAUTH_SESSION_KV_ID" },
-    { "binding": "OAUTH_STATE", "id": "REPLACE_WITH_OAUTH_STATE_KV_ID" }
+    { "binding": "OAUTH_SESSION", "id": "ef24c114d4fb4ff0bd46f50dbbbe5265" },
+    { "binding": "OAUTH_STATE", "id": "ee90dc189c5d40b4b6fb00fa45e173c9" }
   ]
 }

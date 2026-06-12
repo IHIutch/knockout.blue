@@ -11,7 +11,7 @@ export const Route = createFileRoute('/b/$handle')({
   loader: ({ params }) => getBracketForActor({ data: params.handle }),
   head: ({ loaderData }) => {
     if (!loaderData || loaderData.status !== 'ok') {
-      return { meta: [{ title: 'Bracket not found — bracket.blue' }] }
+      return { meta: [{ title: 'Bracket not found — knockout.blue' }] }
     }
     const derived = deriveBracket(loaderData.record.winners, ACTIVE_FIELD)
     const champion = derived.champion ? TEAMS[derived.champion] : null
@@ -20,10 +20,10 @@ export const Route = createFileRoute('/b/$handle')({
       ? `Champion pick: ${champion.name} · ${derived.completeness.picked}/${derived.completeness.total} picks`
       : `${derived.completeness.picked}/${derived.completeness.total} picks made`
     // Absolute URL required by OG crawlers; production origin is what matters to them.
-    const ogImage = `https://bracket.blue/b/${loaderData.handle}/og.png`
+    const ogImage = `https://knockout.blue/b/${loaderData.handle}/og.png`
     return {
       meta: [
-        { title: `${title} — bracket.blue` },
+        { title: `${title} — knockout.blue` },
         { name: 'description', content: description },
         { property: 'og:title', content: title },
         { property: 'og:description', content: description },

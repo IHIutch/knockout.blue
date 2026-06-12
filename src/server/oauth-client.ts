@@ -53,8 +53,8 @@ export function getOAuthClient(): OAuthClient {
     ? { redirect_uris, scope: OAUTH_SCOPE }
     : {
         client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-        client_name: 'bracket.blue — World Cup 2026 Brackets',
-        client_uri: 'https://bracket.blue',
+        client_name: 'knockout.blue — World Cup 2026 Brackets',
+        client_uri: 'https://knockout.blue',
         redirect_uris,
         scope: OAUTH_SCOPE,
       }

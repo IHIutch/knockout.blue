@@ -1,8 +1,8 @@
-# bracket.blue
+# knockout.blue
 
 World Cup 2026 knockout-bracket picks, built on the [AT Protocol](https://atproto.com). Your
-bracket is a `blue.bracket.wc2026` record in **your own PDS** — this app has no database.
-Anyone's bracket is viewable at `https://bracket.blue/b/<handle>`, resolved live from their
+bracket is a `blue.knockout.wc2026` record in **your own PDS** — this app has no database.
+Anyone's bracket is viewable at `https://knockout.blue/b/<handle>`, resolved live from their
 repo, with a generated social preview image of the full bracket.
 
 ## Stack
@@ -28,14 +28,14 @@ npm run deploy   # build + wrangler deploy (requires `wrangler login`)
   (public client — no JWKs). Tokens live in Cloudflare KV (`OAUTH_SESSION`/`OAUTH_STATE`
   bindings, simulated locally); the browser only holds an HMAC-signed HTTP-only cookie
   with `{ did, handle }`. PDS writes happen in `src/server/auth.ts` server functions.
-- **Granular scope**: `atproto repo?collection=blue.bracket.wc2026` — consent grants
+- **Granular scope**: `atproto repo?collection=blue.knockout.wc2026` — consent grants
   write access to our record collection only, not the whole account.
 - **Sign-in UX**: one-click "Sign in with Bluesky" authorizes against `https://bsky.social`
   with no handle needed (the PDS identifies the user, and offers account creation);
   self-hosters can enter a handle, DID, or PDS URL.
 - atproto OAuth forbids `localhost` as an origin. Dev runs on `127.0.0.1` and uses the
   spec's loopback client — wired automatically in `vite.config.ts`. Production `client_id`
-  is `https://bracket.blue/oauth/client-metadata.json` (static asset in `public/`).
+  is `https://knockout.blue/oauth/client-metadata.json` (static asset in `public/`).
 - **Module-graph rule**: anything importing `cloudflare:workers` (everything in
   `src/server/` except `auth.ts`'s server-fn wrappers) must stay out of the client graph —
   server fns load those modules via dynamic `import()` inside handler bodies, and route
@@ -71,18 +71,18 @@ matchups (slot labels for each match are right there in `MATCHES`), then deploy.
 |---|---|
 | `src/lib/tournament/data.ts` | Static truth: 48 teams, FIFA matches 73–104, venues/dates |
 | `src/lib/bracket/derive.ts` | Pure picks→bracket pipeline (kept-if-valid invalidation) |
-| `src/lib/bracket/schema.ts` | Zod schema for the `blue.bracket.wc2026` record |
+| `src/lib/bracket/schema.ts` | Zod schema for the `blue.knockout.wc2026` record |
 | `src/lib/atproto/` | Identity resolution, public PDS reads |
 | `src/server/` | OAuth client + KV stores, signed session cookie, auth/publish server fns, UFOs stats |
 | `src/lib/og/render.tsx` | takumi template for `/b/$handle/og.png` (1200×630) |
 | `src/routes/b.$handle.tsx` | SSR share page with OG meta |
-| `lexicons/blue.bracket.wc2026.json` | Lexicon doc (documentation; runtime uses Zod) |
+| `lexicons/blue.knockout.wc2026.json` | Lexicon doc (documentation; runtime uses Zod) |
 
 ### Record shape
 
 ```json
 {
-  "$type": "blue.bracket.wc2026",
+  "$type": "blue.knockout.wc2026",
   "schemaVersion": 1,
   "winners": { "73": "KOR", "...": "...", "104": "BRA" },
   "createdAt": "2026-06-28T…",

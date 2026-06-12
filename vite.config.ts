@@ -8,11 +8,11 @@ import { defineConfig } from 'vite'
 // atproto OAuth forbids "localhost" as an origin; dev must run on 127.0.0.1.
 // The loopback client_id below is the spec-defined exception for local dev.
 const DEV_ORIGIN = 'http://127.0.0.1:3000'
-const PROD_ORIGIN = 'https://bracket.blue'
+const PROD_ORIGIN = 'https://knockout.blue'
 // Granular scope: consent screen grants write access ONLY to our record
 // collection, not the whole account (string built by @atcute/oauth-types
-// scope.repo({ collection: ['blue.bracket.wc2026'] })).
-const OAUTH_SCOPE = 'atproto repo?collection=blue.bracket.wc2026'
+// scope.repo({ collection: ['blue.knockout.wc2026'] })).
+const OAUTH_SCOPE = 'atproto repo?collection=blue.knockout.wc2026'
 
 const config = defineConfig(({ command }) => {
   const dev = command === 'serve'

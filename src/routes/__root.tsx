@@ -12,7 +12,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'bracket.blue — World Cup 2026 bracket picks' },
+      { title: 'knockout.blue — World Cup 2026 bracket picks' },
       {
         name: 'description',
         content:
