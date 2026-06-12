@@ -24,21 +24,12 @@ export function BracketStats() {
   return (
     <p className="text-sm text-zinc-400">
       <span className="font-semibold text-sky-300 tabular-nums">
-        {stats.brackets.toLocaleString('en-US')}
+        {stats.brackets}
       </span>
       {' '}
       {stats.brackets === 1 ? 'bracket' : 'brackets'}
       {' '}
       published across the atmosphere
-      {stats.accounts > 1 && (
-        <span className="text-zinc-500">
-          {' '}
-          · ~
-          {stats.accounts.toLocaleString('en-US')}
-          {' '}
-          accounts
-        </span>
-      )}
     </p>
   )
 }
