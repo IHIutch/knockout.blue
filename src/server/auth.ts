@@ -18,6 +18,7 @@ import {
   winnersSchema,
 } from '../lib/bracket/schema'
 import { deriveFieldFromGroupPicks } from '../lib/tournament/groupStage'
+import { RETURN_TO_COOKIE, RETURN_TO_MAX_AGE, sanitizeReturnTo } from './return-to'
 
 const publishInputSchema = z.object({
   winners: winnersSchema,
@@ -36,12 +37,29 @@ const BSKY_PDS = 'https://bsky.social'
  * Bluesky") we authorize against bsky.social and let the PDS's own login
  * page identify the user. An identifier may be a handle, DID, or a PDS URL
  * (for self-hosters). Returns the authorization URL to redirect to.
+ *
+ * `returnTo` is the in-app path that initiated sign-in; it rides the OAuth
+ * round-trip in a short-lived cookie so the callback can land the user
+ * right back where they were.
  */
 export const startLogin = createServerFn({ method: 'POST' })
-  .validator((identifier: string | null) => identifier)
-  .handler(async ({ data: identifier }) => {
+  .validator((input: { identifier: string | null, returnTo?: string }) => input)
+  .handler(async ({ data }) => {
     const { getOAuthClient, OAUTH_SCOPE } = await import('./oauth-client')
-    const trimmed = identifier?.trim().replace(/^@/, '') ?? ''
+    const { setCookie } = await import('@tanstack/react-start/server')
+
+    const returnTo = sanitizeReturnTo(data.returnTo)
+    if (returnTo) {
+      setCookie(RETURN_TO_COOKIE, returnTo, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: !import.meta.env.DEV,
+        path: '/',
+        maxAge: RETURN_TO_MAX_AGE,
+      })
+    }
+
+    const trimmed = data.identifier?.trim().replace(/^@/, '') ?? ''
 
     let target
     if (trimmed === '') {

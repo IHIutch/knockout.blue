@@ -49,7 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signIn = useCallback(async (identifier: string | null) => {
-    const url = await startLogin({ data: identifier })
+    // Capture where sign-in started so the OAuth callback can return here.
+    const returnTo = window.location.pathname + window.location.search
+    const url = await startLogin({ data: { identifier, returnTo } })
     window.location.assign(url)
     // Give the browser a beat to navigate so callers don't flash error UI.
     await new Promise(resolve => setTimeout(resolve, 200))
