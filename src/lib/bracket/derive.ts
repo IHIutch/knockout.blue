@@ -1,11 +1,11 @@
-import {
-  MATCHES,
-  MATCH_NUMBERS,
-  type R32Field,
-  type SlotSource,
-  type TeamCode,
-} from '../tournament/data'
+import type { R32Field, SlotSource, TeamCode } from '../tournament/data'
 import type { WinnersMap } from './schema'
+
+import {
+  MATCH_NUMBERS,
+  MATCHES,
+
+} from '../tournament/data'
 
 export interface ResolvedMatch {
   match: number
@@ -53,7 +53,8 @@ export function deriveBracket(winners: WinnersMap, field: R32Field): ResolvedBra
         return matches[source.match].picked
       case 'matchLoser': {
         const upstream = matches[source.match]
-        if (!upstream.home || !upstream.away || !upstream.picked) return null
+        if (!upstream.home || !upstream.away || !upstream.picked)
+          return null
         return upstream.picked === upstream.home ? upstream.away : upstream.home
       }
     }
@@ -79,8 +80,8 @@ export function deriveBracket(winners: WinnersMap, field: R32Field): ResolvedBra
       : null,
     third: matches[103].picked,
     completeness: {
-      picked: resolved.filter((m) => m.picked !== null).length,
-      pickable: resolved.filter((m) => m.home !== null && m.away !== null).length,
+      picked: resolved.filter(m => m.picked !== null).length,
+      pickable: resolved.filter(m => m.home !== null && m.away !== null).length,
       total: MATCH_NUMBERS.length,
     },
   }

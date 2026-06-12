@@ -1,18 +1,18 @@
 {
   "name": "bracket-blue",
-  "private": true,
   "type": "module",
+  "private": true,
   "imports": {
     "#/*": "./src/*"
   },
   "scripts": {
     "dev": "vite dev --port 3000",
-    "generate-routes": "tsr generate",
-    "build": "vite build",
+    "build": "vite build && tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest run",
     "gen:flags": "tsx scripts/gen-flags.ts",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "lint:fix": "eslint --fix"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.2",
@@ -54,13 +54,5 @@
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "vitest": "^4.1.5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss",
-      "sharp",
-      "workerd"
-    ]
   }
 }

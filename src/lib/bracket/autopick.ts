@@ -1,6 +1,8 @@
-import { MATCH_NUMBERS, TEAMS, type R32Field } from '../tournament/data'
-import { deriveBracket } from './derive'
+import type { R32Field } from '../tournament/data'
 import type { MatchKey, WinnersMap } from './schema'
+
+import { MATCH_NUMBERS, TEAMS } from '../tournament/data'
+import { deriveBracket } from './derive'
 
 export type AutopickMode = 'chalk' | 'chaos'
 
@@ -20,9 +22,10 @@ export function autopick(
   for (const n of MATCH_NUMBERS) {
     const { matches } = deriveBracket(result, field)
     const m = matches[n]
-    if (m.picked || !m.home || !m.away) continue
-    const pick =
-      mode === 'chalk'
+    if (m.picked || !m.home || !m.away)
+      continue
+    const pick
+      = mode === 'chalk'
         ? TEAMS[m.home].rank <= TEAMS[m.away].rank
           ? m.home
           : m.away

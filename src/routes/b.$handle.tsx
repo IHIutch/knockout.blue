@@ -1,8 +1,9 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
+
 import { Bracket } from '../components/Bracket'
 import { Flag } from '../components/Flag'
-import { deriveBracket } from '../lib/bracket/derive'
 import { getBracketForActor } from '../lib/atproto/readBracket'
+import { deriveBracket } from '../lib/bracket/derive'
 import { TEAMS } from '../lib/tournament/data'
 import { ACTIVE_FIELD } from '../lib/tournament/field'
 
@@ -39,6 +40,7 @@ export const Route = createFileRoute('/b/$handle')({
   component: SharePage,
 })
 
+// eslint-disable-next-line react-refresh/only-export-components
 function SharePage() {
   const lookup = Route.useLoaderData()
 
@@ -71,9 +73,18 @@ function SharePage() {
     <main className="mx-auto max-w-7xl px-4 pb-16">
       <section className="flex flex-wrap items-center justify-between gap-4 py-6">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">@{lookup.handle}</h1>
+          <h1 className="text-xl font-bold tracking-tight">
+            @
+            {lookup.handle}
+          </h1>
           <p className="mt-1 text-sm text-zinc-400">
-            World Cup 2026 picks · {derived.completeness.picked}/{derived.completeness.total} made
+            World Cup 2026 picks ·
+            {' '}
+            {derived.completeness.picked}
+            /
+            {derived.completeness.total}
+            {' '}
+            made
           </p>
         </div>
         {champion && (

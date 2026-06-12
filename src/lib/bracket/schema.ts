@@ -1,5 +1,8 @@
 import { z } from 'zod'
-import { MATCH_NUMBERS, TEAM_CODES, type TeamCode } from '../tournament/data'
+
+import type { TeamCode } from '../tournament/data'
+
+import { MATCH_NUMBERS, TEAM_CODES } from '../tournament/data'
 import { BRACKET_NSID } from './nsid'
 
 /** FIFA match numbers as record keys ("73"–"104"). */
@@ -35,7 +38,7 @@ export type BracketRecord = z.infer<typeof bracketRecordSchema>
 
 export function buildRecord(
   winners: WinnersMap,
-  timestamps: { createdAt: string; updatedAt: string },
+  timestamps: { createdAt: string, updatedAt: string },
 ): BracketRecord {
   return bracketRecordSchema.parse({
     $type: BRACKET_NSID,

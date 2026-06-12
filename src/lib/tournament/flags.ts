@@ -1,4 +1,6 @@
-import { TEAMS, type TeamCode } from './data'
+import type { TeamCode } from './data'
+
+import { TEAMS } from './data'
 import { FLAG_SVG } from './flags.generated'
 
 /**
@@ -20,7 +22,8 @@ function base64(input: string): string {
 
 /** Data URI for an <img src>, or undefined if the flag is unknown. */
 export function flagDataUri(code: TeamCode): string | undefined {
-  if (cache.has(code)) return cache.get(code)
+  if (cache.has(code))
+    return cache.get(code)
   const svg = FLAG_SVG[TEAMS[code].iso]
   const uri = svg ? `data:image/svg+xml;base64,${base64(svg)}` : undefined
   cache.set(code, uri)

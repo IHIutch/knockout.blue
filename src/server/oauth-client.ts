@@ -1,6 +1,11 @@
-import { OAuthClient, type PublicClientMetadata, type Store } from '@atcute/oauth-node-client'
+import type { PublicClientMetadata, Store } from '@atcute/oauth-node-client'
+
+import { OAuthClient } from '@atcute/oauth-node-client'
+
+import type { KvBinding } from './env'
+
 import { actorResolver } from '../lib/atproto/identity'
-import { env, type KvBinding } from './env'
+import { env } from './env'
 
 /**
  * Server-side AT proto OAuth (public client — no keyset/JWKs needed).
@@ -39,7 +44,8 @@ function kvStore<V>(kv: KvBinding, prefix: string, ttlSeconds?: number): Store<s
 let client: OAuthClient | undefined
 
 export function getOAuthClient(): OAuthClient {
-  if (client) return client
+  if (client)
+    return client
 
   const redirect_uris = [import.meta.env.VITE_OAUTH_REDIRECT_URI]
   // Omitting client_id in dev makes atcute build the loopback client.

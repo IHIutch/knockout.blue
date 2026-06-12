@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
+
 import { Bracket } from '../components/Bracket'
 import { BracketStats } from '../components/BracketStats'
 import { EditorToolbar } from '../components/EditorToolbar'
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/')({
   component: Editor,
 })
 
+// eslint-disable-next-line react-refresh/only-export-components
 function Editor() {
   const { authError } = Route.useSearch()
   const draft = useBracketDraft()
@@ -38,14 +40,18 @@ function Editor() {
 
       {authError && (
         <div className="mb-4 rounded-xl border border-red-900/60 bg-red-950/40 px-4 py-3 text-sm text-red-200">
-          Sign-in didn&apos;t go through: {authError}
+          Sign-in didn&apos;t go through:
+          {' '}
+          {authError}
         </div>
       )}
 
       {!PICKS_ARE_OPEN && (
         <div className="mb-4 rounded-xl border border-sky-900/60 bg-sky-950/40 px-4 py-3 text-sm text-sky-200">
-          The group stage wraps up June 27 — picks open when the Round of 32 field is set on{' '}
-          <span className="font-semibold">June 28</span>. Here&apos;s the bracket so far.
+          The group stage wraps up June 27 — picks open when the Round of 32 field is set on
+          {' '}
+          <span className="font-semibold">June 28</span>
+          . Here&apos;s the bracket so far.
         </div>
       )}
 
@@ -54,9 +60,11 @@ function Editor() {
       <PublishBar
         derived={draft.derived}
         action={
-          draft.hydrated ? (
-            <PublishAction winners={draft.winners} picksMade={draft.derived.completeness.picked} />
-          ) : null
+          draft.hydrated
+            ? (
+                <PublishAction winners={draft.winners} picksMade={draft.derived.completeness.picked} />
+              )
+            : null
         }
       />
     </main>

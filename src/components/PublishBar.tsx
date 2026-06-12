@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
+
 import type { ResolvedBracket } from '../lib/bracket/derive'
+
 import { TEAMS } from '../lib/tournament/data'
 import { Flag } from './Flag'
 
@@ -20,12 +22,16 @@ export function PublishBar({
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex items-baseline justify-between gap-2 text-xs">
             <span className="font-medium text-zinc-300 tabular-nums">
-              {picked}/{total} picks made
+              {picked}
+              /
+              {total}
+              {' '}
+              picks made
             </span>
             {champion && (
               <span className="flex items-center gap-1.5 truncate text-zinc-400">
                 Your champion:
-                <Flag code={champion.code} className="h-3 w-4 shrink-0 rounded-[2px] ring-1 ring-black/10" />
+                <Flag code={champion.code} className="h-3 w-4 shrink-0 rounded-xs ring-1 ring-black/10" />
                 <span className="font-semibold text-zinc-200">{champion.name}</span>
               </span>
             )}

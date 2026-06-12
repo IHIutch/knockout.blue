@@ -1,6 +1,6 @@
-import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 import { AuthButton } from '../components/AuthButton'
 import { Header } from '../components/Header'
@@ -26,6 +26,7 @@ export const Route = createRootRoute({
   component: RootLayout,
 })
 
+// eslint-disable-next-line react-refresh/only-export-components
 function RootLayout() {
   return (
     <AuthProvider>
@@ -37,6 +38,7 @@ function RootLayout() {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">

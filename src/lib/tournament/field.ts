@@ -8,7 +8,7 @@ import { DEV_R32_FIELD } from './fixture.dev'
  * flow is buildable now. (import.meta.env.DEV is statically replaced, so
  * the fixture is tree-shaken out of production bundles.)
  */
-export const ACTIVE_FIELD =
-  R32_FIELD_IS_SET || !import.meta.env.DEV ? LIVE_R32_FIELD : DEV_R32_FIELD
+export const ACTIVE_FIELD
+  = R32_FIELD_IS_SET || !import.meta.env.DEV ? LIVE_R32_FIELD : DEV_R32_FIELD
 
 export const PICKS_ARE_OPEN = R32_FIELD_IS_SET || import.meta.env.DEV

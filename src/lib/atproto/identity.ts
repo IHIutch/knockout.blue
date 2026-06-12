@@ -1,10 +1,12 @@
+import type { ResolvedActor } from '@atcute/identity-resolver'
+
 import {
   CompositeDidDocumentResolver,
   LocalActorResolver,
   PlcDidDocumentResolver,
+
   WebDidDocumentResolver,
   XrpcHandleResolver,
-  type ResolvedActor,
 } from '@atcute/identity-resolver'
 import { isActorIdentifier } from '@atcute/lexicons/syntax'
 
@@ -27,10 +29,12 @@ export const actorResolver = new LocalActorResolver({
 /** Resolve a handle or DID; null for malformed identifiers or failed resolution. */
 export async function resolveActor(identifier: string): Promise<ResolvedActor | null> {
   const trimmed = identifier.trim().replace(/^@/, '')
-  if (!isActorIdentifier(trimmed)) return null
+  if (!isActorIdentifier(trimmed))
+    return null
   try {
     return await actorResolver.resolve(trimmed)
-  } catch {
+  }
+  catch {
     return null
   }
 }

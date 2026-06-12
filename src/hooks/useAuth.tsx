@@ -1,17 +1,19 @@
+import type { ReactNode } from 'react'
+
 import {
   createContext,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useState,
-  type ReactNode,
 } from 'react'
+
 import { getSessionUser, logout, startLogin } from '../server/auth'
 
-export type AuthState =
-  | { status: 'loading' }
-  | { status: 'anonymous' }
-  | { status: 'signed-in'; did: string; handle: string }
+export type AuthState
+  = | { status: 'loading' }
+    | { status: 'anonymous' }
+    | { status: 'signed-in', did: string, handle: string }
 
 interface AuthApi {
   state: AuthState
@@ -33,11 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false
     getSessionUser()
       .then((user) => {
-        if (cancelled) return
+        if (cancelled)
+          return
         setState(user ? { status: 'signed-in', ...user } : { status: 'anonymous' })
       })
       .catch(() => {
-        if (!cancelled) setState({ status: 'anonymous' })
+        if (!cancelled)
+          setState({ status: 'anonymous' })
       })
     return () => {
       cancelled = true
@@ -48,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const url = await startLogin({ data: identifier })
     window.location.assign(url)
     // Give the browser a beat to navigate so callers don't flash error UI.
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    await new Promise(resolve => setTimeout(resolve, 200))
   }, [])
 
   const signOut = useCallback(async () => {
@@ -56,11 +60,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ status: 'anonymous' })
   }, [])
 
-  return <AuthContext.Provider value={{ state, signIn, signOut }}>{children}</AuthContext.Provider>
+  return <AuthContext value={{ state, signIn, signOut }}>{children}</AuthContext>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthApi {
-  const api = useContext(AuthContext)
-  if (!api) throw new Error('useAuth must be used inside <AuthProvider>')
+  const api = use(AuthContext)
+  if (!api)
+    throw new Error('useAuth must be used inside <AuthProvider>')
   return api
 }

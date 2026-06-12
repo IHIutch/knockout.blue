@@ -1,18 +1,21 @@
 import { Link } from '@tanstack/react-router'
 import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
-import { useAuth } from '../hooks/useAuth'
+
 import type { WinnersMap } from '../lib/bracket/schema'
+
+import { useAuth } from '../hooks/useAuth'
 import { publishBracket } from '../server/auth'
 import { AuthButton } from './AuthButton'
 
 /** The right side of the PublishBar: sign-in prompt → publish → share link. */
-export function PublishAction({ winners, picksMade }: { winners: WinnersMap; picksMade: number }) {
+export function PublishAction({ winners, picksMade }: { winners: WinnersMap, picksMade: number }) {
   const { state } = useAuth()
   const [phase, setPhase] = useState<'idle' | 'publishing' | 'done' | 'error'>('idle')
   const [copied, setCopied] = useState(false)
 
-  if (state.status === 'loading') return null
+  if (state.status === 'loading')
+    return null
   if (state.status === 'anonymous') {
     return <AuthButton label="Sign in to publish" panelDirection="up" />
   }
@@ -24,7 +27,8 @@ export function PublishAction({ winners, picksMade }: { winners: WinnersMap; pic
     try {
       await publishBracket({ data: winners })
       setPhase('done')
-    } catch {
+    }
+    catch {
       setPhase('error')
     }
   }
@@ -32,7 +36,7 @@ export function PublishAction({ winners, picksMade }: { winners: WinnersMap; pic
   const copy = async () => {
     await navigator.clipboard.writeText(shareUrl)
     setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    setTimeout(setCopied, 1500, false)
   }
 
   if (phase === 'done') {

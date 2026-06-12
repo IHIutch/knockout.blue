@@ -1,15 +1,19 @@
 import type {} from '@atcute/atproto'
+
 import { Client, simpleFetchHandler } from '@atcute/client'
 import { createServerFn } from '@tanstack/react-start'
-import { bracketRecordSchema, type BracketRecord } from '../bracket/schema'
+
+import type { BracketRecord } from '../bracket/schema'
+
 import { BRACKET_NSID } from '../bracket/nsid'
+import { bracketRecordSchema } from '../bracket/schema'
 import { resolveActor } from './identity'
 
-export type BracketLookup =
-  | { status: 'ok'; handle: string; did: string; record: BracketRecord }
-  | { status: 'not-found'; identifier: string }
-  | { status: 'no-bracket'; handle: string; did: string }
-  | { status: 'invalid-record'; handle: string; did: string }
+export type BracketLookup
+  = | { status: 'ok', handle: string, did: string, record: BracketRecord }
+    | { status: 'not-found', identifier: string }
+    | { status: 'no-bracket', handle: string, did: string }
+    | { status: 'invalid-record', handle: string, did: string }
 
 /**
  * Fetch someone's published bracket straight from their PDS — no app
@@ -18,7 +22,8 @@ export type BracketLookup =
  */
 export async function lookupBracket(identifier: string): Promise<BracketLookup> {
   const actor = await resolveActor(identifier)
-  if (!actor) return { status: 'not-found', identifier }
+  if (!actor)
+    return { status: 'not-found', identifier }
 
   const rpc = new Client({ handler: simpleFetchHandler({ service: actor.pds }) })
   const response = await rpc.get('com.atproto.repo.getRecord', {

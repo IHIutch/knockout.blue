@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useReducer } from 'react'
-import { autopick, type AutopickMode } from '../lib/bracket/autopick'
-import { deriveBracket } from '../lib/bracket/derive'
+
+import type { AutopickMode } from '../lib/bracket/autopick'
 import type { MatchKey, WinnersMap } from '../lib/bracket/schema'
-import { loadDraft, saveDraft } from '../lib/draft'
 import type { TeamCode } from '../lib/tournament/data'
+
+import { autopick } from '../lib/bracket/autopick'
+import { deriveBracket } from '../lib/bracket/derive'
+import { loadDraft, saveDraft } from '../lib/draft'
 import { ACTIVE_FIELD } from '../lib/tournament/field'
 
 interface DraftState {
@@ -12,11 +15,11 @@ interface DraftState {
   hydrated: boolean
 }
 
-type DraftAction =
-  | { type: 'hydrate'; winners: WinnersMap }
-  | { type: 'pick'; match: number; team: TeamCode }
-  | { type: 'autopick'; mode: AutopickMode }
-  | { type: 'clear' }
+type DraftAction
+  = | { type: 'hydrate', winners: WinnersMap }
+    | { type: 'pick', match: number, team: TeamCode }
+    | { type: 'autopick', mode: AutopickMode }
+    | { type: 'clear' }
 
 function reducer(state: DraftState, action: DraftAction): DraftState {
   switch (action.type) {
@@ -28,7 +31,8 @@ function reducer(state: DraftState, action: DraftAction): DraftState {
       // Tapping the already-picked team unpicks it.
       if (winners[key] === action.team) {
         delete winners[key]
-      } else {
+      }
+      else {
         winners[key] = action.team
       }
       return { ...state, winners }
@@ -50,8 +54,9 @@ export function useBracketDraft() {
   }, [])
 
   useEffect(() => {
-    if (!state.hydrated) return
-    const t = setTimeout(() => saveDraft(state.winners), 300)
+    if (!state.hydrated)
+      return
+    const t = setTimeout(saveDraft, 300, state.winners)
     return () => clearTimeout(t)
   }, [state])
 

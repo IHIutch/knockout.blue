@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest'
+
+import type { WinnersMap } from './schema'
+
 import {
   LIVE_R32_FIELD,
-  MATCHES,
   MATCH_NUMBERS,
+  MATCHES,
   R32_MATCH_NUMBERS,
-  TEAMS,
   TEAM_CODES,
+  TEAMS,
 } from '../tournament/data'
 import { DEV_R32_FIELD } from '../tournament/fixture.dev'
 import { autopick } from './autopick'
 import { deriveBracket, pruneInvalidPicks } from './derive'
 import { BRACKET_NSID } from './nsid'
-import { bracketRecordSchema, type WinnersMap } from './schema'
+import { bracketRecordSchema } from './schema'
 
 describe('tournament data', () => {
   it('has 48 teams in 12 groups of 4', () => {
@@ -21,7 +24,7 @@ describe('tournament data', () => {
       byGroup.set(team.group, (byGroup.get(team.group) ?? 0) + 1)
     }
     expect(byGroup.size).toBe(12)
-    expect([...byGroup.values()].every((n) => n === 4)).toBe(true)
+    expect([...byGroup.values()].every(n => n === 4)).toBe(true)
   })
 
   it('covers matches 73–104 with backward-only references', () => {
@@ -32,7 +35,8 @@ describe('tournament data', () => {
       for (const slot of [info.home, info.away]) {
         if (slot.kind !== 'groupSlot') {
           expect(slot.match).toBeLessThan(n)
-        } else {
+        }
+        else {
           expect(n).toBeLessThanOrEqual(88)
         }
       }
@@ -56,7 +60,7 @@ describe('bracketRecordSchema', () => {
   const valid = {
     $type: BRACKET_NSID,
     schemaVersion: 1,
-    winners: { '73': 'KOR', '104': 'BRA' },
+    winners: { 73: 'KOR', 104: 'BRA' },
     createdAt: '2026-06-11T00:00:00.000Z',
     updatedAt: '2026-06-11T00:00:00.000Z',
   }
@@ -71,8 +75,8 @@ describe('bracketRecordSchema', () => {
 
   it.each([
     ['wrong $type', { ...valid, $type: 'app.bsky.feed.post' }],
-    ['unknown team code', { ...valid, winners: { '73': 'XYZ' } }],
-    ['match number out of range', { ...valid, winners: { '72': 'BRA' } }],
+    ['unknown team code', { ...valid, winners: { 73: 'XYZ' } }],
+    ['match number out of range', { ...valid, winners: { 72: 'BRA' } }],
     ['non-ISO timestamp', { ...valid, createdAt: 'yesterday' }],
     ['missing winners', { $type: BRACKET_NSID, schemaVersion: 1, createdAt: valid.createdAt, updatedAt: valid.updatedAt }],
   ])('rejects %s', (_label, record) => {
@@ -109,21 +113,21 @@ describe('deriveBracket', () => {
 
   it('keeps downstream picks stored but invalid when an upstream pick flips, and revalidates on flip-back', () => {
     // BRA's path through the dev fixture: M76 → M91 → M99 → M102 → M104.
-    const winners: WinnersMap = { '76': 'BRA', '91': 'BRA', '99': 'BRA', '102': 'BRA', '104': 'BRA' }
+    const winners: WinnersMap = { 76: 'BRA', 91: 'BRA', 99: 'BRA', 102: 'BRA', 104: 'BRA' }
     const before = deriveBracket(winners, DEV_R32_FIELD)
     expect(before.champion).toBe('BRA')
 
-    const flipped = deriveBracket({ ...winners, '76': 'JPN' }, DEV_R32_FIELD)
+    const flipped = deriveBracket({ ...winners, 76: 'JPN' }, DEV_R32_FIELD)
     expect(flipped.matches[91].picked).toBeNull()
     expect(flipped.matches[91].storedPick).toBe('BRA')
     expect(flipped.champion).toBeNull()
 
-    const restored = deriveBracket({ ...winners, '76': 'BRA' }, DEV_R32_FIELD)
+    const restored = deriveBracket({ ...winners, 76: 'BRA' }, DEV_R32_FIELD)
     expect(restored.champion).toBe('BRA')
   })
 
   it('ignores picks for teams that are not participants', () => {
-    const result = deriveBracket({ '73': 'BRA' }, DEV_R32_FIELD)
+    const result = deriveBracket({ 73: 'BRA' }, DEV_R32_FIELD)
     expect(result.matches[73].picked).toBeNull()
     expect(result.matches[73].storedPick).toBe('BRA')
     expect(result.completeness.picked).toBe(0)
@@ -132,8 +136,8 @@ describe('deriveBracket', () => {
 
 describe('pruneInvalidPicks', () => {
   it('drops invalidated downstream picks and keeps valid ones', () => {
-    const winners: WinnersMap = { '76': 'JPN', '91': 'BRA', '99': 'BRA' }
-    expect(pruneInvalidPicks(winners, DEV_R32_FIELD)).toEqual({ '76': 'JPN' })
+    const winners: WinnersMap = { 76: 'JPN', 91: 'BRA', 99: 'BRA' }
+    expect(pruneInvalidPicks(winners, DEV_R32_FIELD)).toEqual({ 76: 'JPN' })
   })
 })
 
@@ -146,7 +150,7 @@ describe('autopick', () => {
   })
 
   it('preserves existing valid picks', () => {
-    const winners = autopick({ '73': 'CAN' }, DEV_R32_FIELD, 'chalk')
+    const winners = autopick({ 73: 'CAN' }, DEV_R32_FIELD, 'chalk')
     expect(winners['73']).toBe('CAN')
   })
 

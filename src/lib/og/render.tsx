@@ -8,9 +8,12 @@
  * no network); the WASM build's embedded Manrope (Latin) covers our text.
  */
 import { render } from 'takumi-js'
+
 import type { ResolvedBracket, ResolvedMatch } from '../bracket/derive'
+import type { TeamCode } from '../tournament/data'
+
+import { TEAMS } from '../tournament/data'
 import { flagDataUri } from '../tournament/flags'
-import { TEAMS, type TeamCode } from '../tournament/data'
 
 /** Bracket halves: matches feeding SF 101 read left→center, SF 102 center←right. */
 const LEFT = { r32: [74, 77, 73, 75, 83, 84, 81, 82], r16: [89, 90, 93, 94], qf: [97, 98], sf: 101 }
@@ -26,7 +29,7 @@ const colors = {
   accentBg: 'rgba(14, 165, 233, 0.18)',
 }
 
-function TeamLine({ team, picked }: { team: TeamCode | null; picked: boolean }) {
+function TeamLine({ team, picked }: { team: TeamCode | null, picked: boolean }) {
   return (
     <div
       style={{
@@ -38,11 +41,13 @@ function TeamLine({ team, picked }: { team: TeamCode | null; picked: boolean }) 
         backgroundColor: picked ? colors.accentBg : 'transparent',
       }}
     >
-      {team ? (
-        <img src={flagDataUri(team)} width={16} height={12} style={{ borderRadius: 2 }} />
-      ) : (
-        <div style={{ display: 'flex', width: 16, height: 12, backgroundColor: colors.border, borderRadius: 2 }} />
-      )}
+      {team
+        ? (
+            <img src={flagDataUri(team)} width={16} height={12} style={{ borderRadius: 2 }} />
+          )
+        : (
+            <div style={{ display: 'flex', width: 16, height: 12, backgroundColor: colors.border, borderRadius: 2 }} />
+          )}
       <span
         style={{
           fontSize: 13,
@@ -74,7 +79,7 @@ function MatchBox({ m }: { m: ResolvedMatch }) {
   )
 }
 
-function Column({ matches, derived }: { matches: number[]; derived: ResolvedBracket }) {
+function Column({ matches, derived }: { matches: number[], derived: ResolvedBracket }) {
   return (
     <div
       style={{
@@ -86,7 +91,7 @@ function Column({ matches, derived }: { matches: number[]; derived: ResolvedBrac
         gap: 4,
       }}
     >
-      {matches.map((n) => (
+      {matches.map(n => (
         <MatchBox key={n} m={derived.matches[n]} />
       ))}
     </div>
@@ -111,32 +116,34 @@ function Center({ derived }: { derived: ResolvedBracket }) {
       <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 3, color: colors.dim }}>
         CHAMPION
       </span>
-      {champion ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          <img
-            src={flagDataUri(champion.code)}
-            width={80}
-            height={60}
-            style={{ borderRadius: 8, border: `2px solid ${colors.accent}` }}
-          />
-          <span style={{ fontSize: 26, fontWeight: 800, color: '#f0f9ff', textAlign: 'center' }}>
-            {champion.name}
-          </span>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          <div
-            style={{
-              display: 'flex',
-              width: 80,
-              height: 60,
-              borderRadius: 8,
-              border: `2px dashed ${colors.border}`,
-            }}
-          />
-          <span style={{ fontSize: 20, fontWeight: 700, color: colors.dim }}>TBD</span>
-        </div>
-      )}
+      {champion
+        ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <img
+                src={flagDataUri(champion.code)}
+                width={80}
+                height={60}
+                style={{ borderRadius: 8, border: `2px solid ${colors.accent}` }}
+              />
+              <span style={{ fontSize: 26, fontWeight: 800, color: '#f0f9ff', textAlign: 'center' }}>
+                {champion.name}
+              </span>
+            </div>
+          )
+        : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  width: 80,
+                  height: 60,
+                  borderRadius: 8,
+                  border: `2px dashed ${colors.border}`,
+                }}
+              />
+              <span style={{ fontSize: 20, fontWeight: 700, color: colors.dim }}>TBD</span>
+            </div>
+          )}
       <div
         style={{
           display: 'flex',
@@ -158,7 +165,7 @@ function Center({ derived }: { derived: ResolvedBracket }) {
   )
 }
 
-export function BracketImage({ handle, derived }: { handle: string; derived: ResolvedBracket }) {
+export function BracketImage({ handle, derived }: { handle: string, derived: ResolvedBracket }) {
   return (
     <div
       style={{
@@ -171,7 +178,7 @@ export function BracketImage({ handle, derived }: { handle: string; derived: Res
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ display: 'flex', alignItems: "flex-start" }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <span style={{ fontSize: 24, fontWeight: 800, color: '#fafafa' }}>bracket</span>
           <span style={{ fontSize: 24, fontWeight: 800, color: colors.accent }}>.blue</span>
         </div>
@@ -193,7 +200,10 @@ export function BracketImage({ handle, derived }: { handle: string; derived: Res
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-        <span style={{ fontSize: 24, fontWeight: 700, color: colors.text }}>@{handle}</span>
+        <span style={{ fontSize: 24, fontWeight: 700, color: colors.text }}>
+          @
+          {handle}
+        </span>
       </div>
     </div>
   )
@@ -209,6 +219,7 @@ const IMAGE_FORMAT = 'png' as const
 /** Content-Type matching IMAGE_FORMAT, for the og image route to serve. */
 export const IMAGE_CONTENT_TYPE = `image/${IMAGE_FORMAT}`
 
+// eslint-disable-next-line react-refresh/only-export-components
 export async function renderBracketImage(
   handle: string,
   derived: ResolvedBracket,

@@ -1,6 +1,8 @@
+import type { SessionUser } from './session-cookie'
+
 import { resolveActor } from '../lib/atproto/identity'
 import { getOAuthClient } from './oauth-client'
-import { sessionSetCookieHeader, type SessionUser } from './session-cookie'
+import { sessionSetCookieHeader } from './session-cookie'
 
 /**
  * Handle the OAuth redirect (response_mode=query): exchange the code, set
@@ -17,13 +19,14 @@ export async function handleOAuthCallback(request: Request): Promise<Response> {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: '/',
+        'Location': '/',
         'Set-Cookie': await sessionSetCookieHeader(user),
       },
     })
-  } catch (err) {
-    const message =
-      params.get('error_description') ?? (err instanceof Error ? err.message : 'Sign-in failed')
+  }
+  catch (err) {
+    const message
+      = params.get('error_description') ?? (err instanceof Error ? err.message : 'Sign-in failed')
     const to = new URL('/', request.url)
     to.searchParams.set('authError', message)
     return new Response(null, { status: 302, headers: { Location: to.toString() } })

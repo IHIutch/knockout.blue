@@ -6,9 +6,9 @@ import { env as workerEnv } from 'cloudflare:workers'
  * tsconfig), so the KV surface we use is declared here.
  */
 export interface KvBinding {
-  get(key: string): Promise<string | null>
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>
-  delete(key: string): Promise<void>
+  get: (key: string) => Promise<string | null>
+  put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void>
+  delete: (key: string) => Promise<void>
 }
 
 interface WorkerEnv {

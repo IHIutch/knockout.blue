@@ -8,35 +8,35 @@
  * real teams on June 27–28 is a one-commit change to R32_TEAMS below.
  */
 
-export type GroupId =
-  | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
-  | 'G' | 'H' | 'I' | 'J' | 'K' | 'L'
+export type GroupId
+  = | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+    | 'G' | 'H' | 'I' | 'J' | 'K' | 'L'
 
-export type TeamCode =
+export type TeamCode
   // Group A
-  | 'MEX' | 'KOR' | 'RSA' | 'CZE'
+  = | 'MEX' | 'KOR' | 'RSA' | 'CZE'
   // Group B
-  | 'CAN' | 'SUI' | 'QAT' | 'BIH'
+    | 'CAN' | 'SUI' | 'QAT' | 'BIH'
   // Group C
-  | 'BRA' | 'MAR' | 'SCO' | 'HAI'
+    | 'BRA' | 'MAR' | 'SCO' | 'HAI'
   // Group D
-  | 'USA' | 'TUR' | 'PAR' | 'AUS'
+    | 'USA' | 'TUR' | 'PAR' | 'AUS'
   // Group E
-  | 'GER' | 'ECU' | 'CIV' | 'CUW'
+    | 'GER' | 'ECU' | 'CIV' | 'CUW'
   // Group F
-  | 'NED' | 'JPN' | 'SWE' | 'TUN'
+    | 'NED' | 'JPN' | 'SWE' | 'TUN'
   // Group G
-  | 'BEL' | 'IRN' | 'EGY' | 'NZL'
+    | 'BEL' | 'IRN' | 'EGY' | 'NZL'
   // Group H
-  | 'ESP' | 'URU' | 'KSA' | 'CPV'
+    | 'ESP' | 'URU' | 'KSA' | 'CPV'
   // Group I
-  | 'FRA' | 'SEN' | 'NOR' | 'IRQ'
+    | 'FRA' | 'SEN' | 'NOR' | 'IRQ'
   // Group J
-  | 'ARG' | 'AUT' | 'ALG' | 'JOR'
+    | 'ARG' | 'AUT' | 'ALG' | 'JOR'
   // Group K
-  | 'POR' | 'COL' | 'UZB' | 'COD'
+    | 'POR' | 'COL' | 'UZB' | 'COD'
   // Group L
-  | 'ENG' | 'CRO' | 'PAN' | 'GHA'
+    | 'ENG' | 'CRO' | 'PAN' | 'GHA'
 
 export interface Team {
   code: TeamCode
@@ -115,7 +115,7 @@ export const TEAM_CODES = Object.keys(TEAMS) as TeamCode[]
 /** Official FIFA knockout match numbers. */
 export const MATCH_NUMBERS = Array.from({ length: 32 }, (_, i) => 73 + i)
 
-export const R32_MATCH_NUMBERS = MATCH_NUMBERS.filter((n) => n <= 88)
+export const R32_MATCH_NUMBERS = MATCH_NUMBERS.filter(n => n <= 88)
 
 export type RoundId = 'r32' | 'r16' | 'qf' | 'sf' | 'thirdPlace' | 'final'
 
@@ -141,11 +141,11 @@ function range(from: number, to: number): number[] {
 }
 
 /** Where a knockout slot's team comes from. */
-export type SlotSource =
+export type SlotSource
   /** R32: a group-stage outcome. `label` is FIFA's slot notation (e.g. "1A", "2C", "3rd C/E/F/H/I"). */
-  | { kind: 'groupSlot'; label: string }
-  | { kind: 'matchWinner'; match: number }
-  | { kind: 'matchLoser'; match: number }
+  = | { kind: 'groupSlot', label: string }
+    | { kind: 'matchWinner', match: number }
+    | { kind: 'matchLoser', match: number }
 
 export interface MatchInfo {
   match: number
@@ -157,14 +157,9 @@ export interface MatchInfo {
   away: SlotSource
 }
 
-const m = (
-  match: number,
-  round: RoundId,
-  date: string,
-  venue: string,
-  home: SlotSource,
-  away: SlotSource,
-): MatchInfo => ({ match, round, date, venue, home, away })
+function m(match: number, round: RoundId, date: string, venue: string, home: SlotSource, away: SlotSource): MatchInfo {
+  return { match, round, date, venue, home, away }
+}
 
 const group = (label: string): SlotSource => ({ kind: 'groupSlot', label })
 const winner = (match: number): SlotSource => ({ kind: 'matchWinner', match })
@@ -182,7 +177,7 @@ export const MATCHES: Record<number, MatchInfo> = Object.fromEntries(
     m(78, 'r32', '2026-06-30', 'AT&T Stadium, Arlington', group('2E'), group('2I')),
     m(79, 'r32', '2026-06-30', 'Estadio Azteca, Mexico City', group('1A'), group('3rd C/E/F/H/I')),
     m(80, 'r32', '2026-07-01', 'Mercedes-Benz Stadium, Atlanta', group('1L'), group('3rd E/H/I/J/K')),
-    m(81, 'r32', '2026-07-01', "Levi's Stadium, Santa Clara", group('1D'), group('3rd B/E/F/I/J')),
+    m(81, 'r32', '2026-07-01', 'Levi\'s Stadium, Santa Clara', group('1D'), group('3rd B/E/F/I/J')),
     m(82, 'r32', '2026-07-01', 'Lumen Field, Seattle', group('1G'), group('3rd A/E/H/I/J')),
     m(83, 'r32', '2026-07-02', 'BMO Field, Toronto', group('2K'), group('2L')),
     m(84, 'r32', '2026-07-02', 'SoFi Stadium, Inglewood', group('1H'), group('2J')),
@@ -210,11 +205,11 @@ export const MATCHES: Record<number, MatchInfo> = Object.fromEntries(
     // Third place + Final
     m(103, 'thirdPlace', '2026-07-18', 'Hard Rock Stadium, Miami Gardens', loser(101), loser(102)),
     m(104, 'final', '2026-07-19', 'MetLife Stadium, East Rutherford', winner(101), winner(102)),
-  ].map((info) => [info.match, info]),
+  ].map(info => [info.match, info]),
 )
 
 /** The two teams contesting an R32 match (73–88). */
-export type R32Field = Record<number, { home: TeamCode | null; away: TeamCode | null }>
+export type R32Field = Record<number, { home: TeamCode | null, away: TeamCode | null }>
 
 /**
  * The real Round-of-32 field. All null until the group stage ends on
@@ -222,10 +217,10 @@ export type R32Field = Record<number, { home: TeamCode | null; away: TeamCode | 
  * launch trigger (one reviewed commit, nothing else changes).
  */
 export const LIVE_R32_FIELD: R32Field = Object.fromEntries(
-  R32_MATCH_NUMBERS.map((n) => [n, { home: null, away: null }]),
+  R32_MATCH_NUMBERS.map(n => [n, { home: null, away: null }]),
 )
 
 /** True once the live R32 field has been filled in (post group stage). */
 export const R32_FIELD_IS_SET = Object.values(LIVE_R32_FIELD).every(
-  (slot) => slot.home !== null && slot.away !== null,
+  slot => slot.home !== null && slot.away !== null,
 )

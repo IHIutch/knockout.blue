@@ -1,5 +1,7 @@
 import type { ResolvedMatch } from '../lib/bracket/derive'
-import { TEAMS, type MatchInfo, type SlotSource, type TeamCode } from '../lib/tournament/data'
+import type { MatchInfo, SlotSource, TeamCode } from '../lib/tournament/data'
+
+import { TEAMS } from '../lib/tournament/data'
 import { Flag } from './Flag'
 
 function sourceLabel(source: SlotSource): string {
@@ -13,7 +15,7 @@ function sourceLabel(source: SlotSource): string {
   }
 }
 
-export function formatMatchDate(iso: string): string {
+function formatMatchDate(iso: string): string {
   return new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -90,7 +92,8 @@ export function MatchCard({
     <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-2">
       <div className="mb-1.5 flex items-baseline justify-between gap-2 px-1 text-[11px] text-zinc-500">
         <span className="font-medium">
-          M{info.match}
+          M
+          {info.match}
           {stale && (
             <span title="A pick here was undone by an earlier change" className="ml-1.5 align-middle text-amber-400">
               ●
@@ -98,7 +101,10 @@ export function MatchCard({
           )}
         </span>
         <span className="truncate">
-          {formatMatchDate(info.date)} · {venueShort}
+          {formatMatchDate(info.date)}
+          {' '}
+          ·
+          {venueShort}
         </span>
       </div>
       <div className="space-y-1">

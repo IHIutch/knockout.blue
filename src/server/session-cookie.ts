@@ -1,4 +1,5 @@
 import { getCookies, setCookie } from '@tanstack/react-start/server'
+
 import { env } from './env'
 
 /**
@@ -18,8 +19,10 @@ export interface SessionUser {
 
 function getSecret(): string {
   const secret = env.SESSION_SECRET
-  if (secret && secret.length >= 32) return secret
-  if (import.meta.env.DEV) return 'dev-only-insecure-session-secret-0000'
+  if (secret && secret.length >= 32)
+    return secret
+  if (import.meta.env.DEV)
+    return 'dev-only-insecure-session-secret-0000'
   throw new Error('SESSION_SECRET (≥32 chars) is required in production')
 }
 
@@ -48,15 +51,16 @@ function decodePayload(payload: string): SessionUser | null {
   try {
     const parsed = JSON.parse(atob(payload.replaceAll('-', '+').replaceAll('_', '/'))) as unknown
     if (
-      parsed !== null &&
-      typeof parsed === 'object' &&
-      typeof (parsed as SessionUser).did === 'string' &&
-      typeof (parsed as SessionUser).handle === 'string'
+      parsed !== null
+      && typeof parsed === 'object'
+      && typeof (parsed as SessionUser).did === 'string'
+      && typeof (parsed as SessionUser).handle === 'string'
     ) {
       return parsed as SessionUser
     }
     return null
-  } catch {
+  }
+  catch {
     return null
   }
 }
@@ -89,9 +93,12 @@ export function clearSessionCookie(): void {
 /** Returns the cookie's user iff the signature verifies; null otherwise. */
 export async function readSessionCookie(): Promise<SessionUser | null> {
   const raw = getCookies()[COOKIE_NAME]
-  if (!raw) return null
+  if (!raw)
+    return null
   const [payload, signature] = raw.split('.')
-  if (!payload || !signature) return null
-  if ((await hmac(payload)) !== signature) return null
+  if (!payload || !signature)
+    return null
+  if ((await hmac(payload)) !== signature)
+    return null
   return decodePayload(payload)
 }

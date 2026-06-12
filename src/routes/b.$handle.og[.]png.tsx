@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+
+import { lookupBracket } from '../lib/atproto/readBracket'
 import { autopick } from '../lib/bracket/autopick'
 import { deriveBracket } from '../lib/bracket/derive'
-import { lookupBracket } from '../lib/atproto/readBracket'
 import { ACTIVE_FIELD } from '../lib/tournament/field'
 
 export const Route = createFileRoute('/b/$handle/og.png')({

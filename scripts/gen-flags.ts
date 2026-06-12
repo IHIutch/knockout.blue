@@ -1,8 +1,8 @@
-import { readFileSync } from 'node:fs'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
 import { TEAMS } from '../src/lib/tournament/data.ts'
 
 /**
@@ -17,7 +17,7 @@ import { TEAMS } from '../src/lib/tournament/data.ts'
  */
 
 const require = createRequire(import.meta.url)
-const SVG_DIR = dirname(require.resolve('flagpack-core/package.json')) + '/svg/m'
+const SVG_DIR = `${dirname(require.resolve('flagpack-core/package.json'))}/svg/m`
 
 const svgs: Record<string, string> = {}
 const missing: string[] = []
@@ -25,7 +25,8 @@ for (const team of Object.values(TEAMS)) {
   try {
     // flagpack-core files are named by UPPERCASE ISO (e.g. US.svg, GB-ENG.svg).
     svgs[team.iso] = readFileSync(`${SVG_DIR}/${team.iso.toUpperCase()}.svg`, 'utf8').trim()
-  } catch {
+  }
+  catch {
     missing.push(team.iso)
   }
 }

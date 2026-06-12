@@ -1,12 +1,16 @@
 import type {} from '@atcute/atproto'
+import type { Did } from '@atcute/lexicons/syntax'
+
 import { Client, ok } from '@atcute/client'
-import { isActorIdentifier, type Did } from '@atcute/lexicons/syntax'
+import { isActorIdentifier } from '@atcute/lexicons/syntax'
 import { createServerFn } from '@tanstack/react-start'
-import { BRACKET_NSID } from '../lib/bracket/nsid'
+
+import type { SessionUser } from './session-cookie'
+
 import { pruneInvalidPicks } from '../lib/bracket/derive'
+import { BRACKET_NSID } from '../lib/bracket/nsid'
 import { bracketRecordSchema, buildRecord, winnersSchema } from '../lib/bracket/schema'
 import { ACTIVE_FIELD } from '../lib/tournament/field'
-import type { SessionUser } from './session-cookie'
 
 const BSKY_PDS = 'https://bsky.social'
 
@@ -29,11 +33,14 @@ export const startLogin = createServerFn({ method: 'POST' })
     let target
     if (trimmed === '') {
       target = { type: 'pds', serviceUrl: BSKY_PDS } as const
-    } else if (/^https?:\/\//.test(trimmed)) {
+    }
+    else if (/^https?:\/\//.test(trimmed)) {
       target = { type: 'pds', serviceUrl: trimmed } as const
-    } else if (isActorIdentifier(trimmed)) {
+    }
+    else if (isActorIdentifier(trimmed)) {
       target = { type: 'account', identifier: trimmed } as const
-    } else {
+    }
+    else {
       throw new Error('Enter a handle like "you.bsky.social", a DID, or a PDS URL')
     }
 
@@ -57,7 +64,8 @@ export const logout = createServerFn({ method: 'POST' }).handler(async () => {
     try {
       const { getOAuthClient } = await import('./oauth-client')
       await getOAuthClient().revoke(user.did as Did)
-    } catch {
+    }
+    catch {
       // Best-effort: KV session is gone either way next time restore fails.
     }
   }
@@ -76,7 +84,8 @@ export const publishBracket = createServerFn({ method: 'POST' })
     const { getOAuthClient } = await import('./oauth-client')
 
     const user = await readSessionCookie()
-    if (!user) throw new Error('Not signed in')
+    if (!user)
+      throw new Error('Not signed in')
 
     const session = await getOAuthClient().restore(user.did as Did)
     const rpc = new Client({ handler: session })
@@ -88,7 +97,8 @@ export const publishBracket = createServerFn({ method: 'POST' })
     })
     if (existing.ok) {
       const parsed = bracketRecordSchema.safeParse(existing.data.value)
-      if (parsed.success) createdAt = parsed.data.createdAt
+      if (parsed.success)
+        createdAt = parsed.data.createdAt
     }
 
     const record = buildRecord(pruneInvalidPicks(winners, ACTIVE_FIELD), {
