@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Bracket } from '../components/Bracket'
+import { Flag } from '../components/Flag'
 import { deriveBracket } from '../lib/bracket/derive'
 import { getBracketForActor } from '../lib/atproto/readBracket'
 import { TEAMS } from '../lib/tournament/data'
@@ -15,7 +16,7 @@ export const Route = createFileRoute('/b/$handle')({
     const champion = derived.champion ? TEAMS[derived.champion] : null
     const title = `@${loaderData.handle}'s World Cup 2026 bracket`
     const description = champion
-      ? `Champion pick: ${champion.name} ${champion.flag} · ${derived.completeness.picked}/${derived.completeness.total} picks`
+      ? `Champion pick: ${champion.name} · ${derived.completeness.picked}/${derived.completeness.total} picks`
       : `${derived.completeness.picked}/${derived.completeness.total} picks made`
     // Absolute URL required by OG crawlers; production origin is what matters to them.
     const ogImage = `https://bracket.blue/b/${loaderData.handle}/og.png`
@@ -76,7 +77,7 @@ function SharePage() {
         </div>
         {champion && (
           <div className="flex items-center gap-3 rounded-xl border border-sky-900/60 bg-sky-950/40 px-4 py-2.5">
-            <span className="text-3xl">{champion.flag}</span>
+            <Flag code={champion.code} className="h-8 w-11 shrink-0 rounded ring-1 ring-black/10" />
             <div>
               <div className="text-[11px] uppercase tracking-wide text-sky-300/80">Champion pick</div>
               <div className="font-semibold text-sky-100">{champion.name}</div>

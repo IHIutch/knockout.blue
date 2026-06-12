@@ -1,5 +1,6 @@
 import type { ResolvedMatch } from '../lib/bracket/derive'
 import { TEAMS, type MatchInfo, type SlotSource, type TeamCode } from '../lib/tournament/data'
+import { Flag } from './Flag'
 
 function sourceLabel(source: SlotSource): string {
   switch (source.kind) {
@@ -56,7 +57,7 @@ function TeamRow({
           : 'border-zinc-800 bg-zinc-900 text-zinc-200'
       } ${clickable ? 'cursor-pointer hover:border-zinc-600' : ''}`}
     >
-      <span className="text-base leading-none">{info.flag}</span>
+      <Flag code={info.code} className="h-3.5 w-5 shrink-0 rounded-[3px] ring-1 ring-black/10" />
       <span className="font-semibold tabular-nums">{info.code}</span>
       <span className="min-w-0 flex-1 truncate text-zinc-400">{info.name}</span>
       <span

@@ -4,31 +4,13 @@
  * with takumi (WASM on workerd). Server-only — import dynamically.
  *
  * Takumi notes: default display is inline (every box sets flex explicitly);
- * emoji flags don't render, so flags come from flagcdn.com PNGs; the WASM
- * build's embedded Manrope (Latin) covers everything we draw.
+ * flags are Flagpack SVGs embedded as base64 data URIs (shared with the UI,
+ * no network); the WASM build's embedded Manrope (Latin) covers our text.
  */
 import { render } from 'takumi-js'
 import type { ResolvedBracket, ResolvedMatch } from '../bracket/derive'
+import { flagDataUri } from '../tournament/flags'
 import { TEAMS, type TeamCode } from '../tournament/data'
-
-/** ISO 3166-1 alpha-2 codes for flagcdn.com (gb-eng/gb-sct for the home nations). */
-const FLAG_ISO: Record<TeamCode, string> = {
-  MEX: 'mx', KOR: 'kr', RSA: 'za', CZE: 'cz',
-  CAN: 'ca', SUI: 'ch', QAT: 'qa', BIH: 'ba',
-  BRA: 'br', MAR: 'ma', SCO: 'gb-sct', HAI: 'ht',
-  USA: 'us', TUR: 'tr', PAR: 'py', AUS: 'au',
-  GER: 'de', ECU: 'ec', CIV: 'ci', CUW: 'cw',
-  NED: 'nl', JPN: 'jp', SWE: 'se', TUN: 'tn',
-  BEL: 'be', IRN: 'ir', EGY: 'eg', NZL: 'nz',
-  ESP: 'es', URU: 'uy', KSA: 'sa', CPV: 'cv',
-  FRA: 'fr', SEN: 'sn', NOR: 'no', IRQ: 'iq',
-  ARG: 'ar', AUT: 'at', ALG: 'dz', JOR: 'jo',
-  POR: 'pt', COL: 'co', UZB: 'uz', COD: 'cd',
-  ENG: 'gb-eng', CRO: 'hr', PAN: 'pa', GHA: 'gh',
-}
-
-const flagUrl = (team: TeamCode, width: 20 | 80 = 20) =>
-  `https://flagcdn.com/w${width}/${FLAG_ISO[team]}.png`
 
 /** Bracket halves: matches feeding SF 101 read left→center, SF 102 center←right. */
 const LEFT = { r32: [74, 77, 73, 75, 83, 84, 81, 82], r16: [89, 90, 93, 94], qf: [97, 98], sf: 101 }
@@ -39,7 +21,7 @@ const colors = {
   card: '#18181b',
   border: '#27272a',
   text: '#e4e4e7',
-  dim: '#52525b',
+  dim: '#cad5e2',
   accent: '#38bdf8',
   accentBg: 'rgba(14, 165, 233, 0.18)',
 }
@@ -57,7 +39,7 @@ function TeamLine({ team, picked }: { team: TeamCode | null; picked: boolean }) 
       }}
     >
       {team ? (
-        <img src={flagUrl(team)} width={16} height={12} style={{ borderRadius: 2 }} />
+        <img src={flagDataUri(team)} width={16} height={12} style={{ borderRadius: 2 }} />
       ) : (
         <div style={{ display: 'flex', width: 16, height: 12, backgroundColor: colors.border, borderRadius: 2 }} />
       )}
@@ -132,7 +114,7 @@ function Center({ derived }: { derived: ResolvedBracket }) {
       {champion ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
           <img
-            src={flagUrl(champion.code, 80)}
+            src={flagDataUri(champion.code)}
             width={80}
             height={60}
             style={{ borderRadius: 8, border: `2px solid ${colors.accent}` }}
@@ -189,12 +171,12 @@ export function BracketImage({ handle, derived }: { handle: string; derived: Res
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+        <div style={{ display: 'flex', alignItems: "flex-start" }}>
           <span style={{ fontSize: 24, fontWeight: 800, color: '#fafafa' }}>bracket</span>
           <span style={{ fontSize: 24, fontWeight: 800, color: colors.accent }}>.blue</span>
         </div>
         <span style={{ fontSize: 15, fontWeight: 600, color: colors.dim }}>
-          World Cup 2026 · {derived.completeness.picked}/{derived.completeness.total} picks
+          World Cup 2026
         </span>
       </div>
 
@@ -211,7 +193,7 @@ export function BracketImage({ handle, derived }: { handle: string; derived: Res
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-        <span style={{ fontSize: 16, fontWeight: 700, color: colors.text }}>@{handle}</span>
+        <span style={{ fontSize: 24, fontWeight: 700, color: colors.text }}>@{handle}</span>
       </div>
     </div>
   )
@@ -219,14 +201,21 @@ export function BracketImage({ handle, derived }: { handle: string; derived: Res
 
 const imageCache = new Map<string, ArrayBuffer>()
 
+const IMAGE_FORMAT = 'webp' as const
+
+/** Content-Type matching IMAGE_FORMAT, for the og image route to serve. */
+export const IMAGE_CONTENT_TYPE = `image/${IMAGE_FORMAT}`
+
 export async function renderBracketImage(
   handle: string,
   derived: ResolvedBracket,
 ): Promise<Uint8Array> {
+  const devicePixelRatio = 2.0;
   return render(<BracketImage handle={handle} derived={derived} />, {
-    width: 1200,
-    height: 630,
-    format: 'png',
+    width: 1200 * devicePixelRatio,
+    height: 630 * devicePixelRatio,
+    format: IMAGE_FORMAT,
+    devicePixelRatio,
     resourcesOptions: { cache: imageCache },
   })
 }

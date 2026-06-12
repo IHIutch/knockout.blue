@@ -24,12 +24,12 @@ export const Route = createFileRoute('/b/$handle/og.png')({
         }
 
         // Takumi (4 MB WASM) loads lazily so it never burdens SSR startup.
-        const { renderBracketImage } = await import('../lib/og/render')
-        const png = await renderBracketImage(handle, deriveBracket(winners, ACTIVE_FIELD))
+        const { renderBracketImage, IMAGE_CONTENT_TYPE } = await import('../lib/og/render')
+        const image = await renderBracketImage(handle, deriveBracket(winners, ACTIVE_FIELD))
 
-        return new Response(png.slice().buffer as ArrayBuffer, {
+        return new Response(image.slice().buffer as ArrayBuffer, {
           headers: {
-            'Content-Type': 'image/png',
+            'Content-Type': IMAGE_CONTENT_TYPE,
             'Cache-Control': 'public, max-age=300',
           },
         })

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { ResolvedBracket } from '../lib/bracket/derive'
 import { TEAMS } from '../lib/tournament/data'
+import { Flag } from './Flag'
 
 export function PublishBar({
   derived,
@@ -22,8 +23,10 @@ export function PublishBar({
               {picked}/{total} picks made
             </span>
             {champion && (
-              <span className="truncate text-zinc-400">
-                Your champion: {champion.flag} <span className="font-semibold text-zinc-200">{champion.name}</span>
+              <span className="flex items-center gap-1.5 truncate text-zinc-400">
+                Your champion:
+                <Flag code={champion.code} className="h-3 w-4 shrink-0 rounded-[2px] ring-1 ring-black/10" />
+                <span className="font-semibold text-zinc-200">{champion.name}</span>
               </span>
             )}
           </div>

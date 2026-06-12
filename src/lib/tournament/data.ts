@@ -41,72 +41,73 @@ export type TeamCode =
 export interface Team {
   code: TeamCode
   name: string
-  flag: string
+  /** ISO 3166-1 code for the Flagpack flag set (gb-eng/gb-sct for the home nations). */
+  iso: string
   group: GroupId
   /** Approximate FIFA world ranking (Dec 2025). Used only for "chalk" autopick ordering. */
   rank: number
 }
 
 export const TEAMS: Record<TeamCode, Team> = {
-  MEX: { code: 'MEX', name: 'Mexico', flag: '🇲🇽', group: 'A', rank: 15 },
-  KOR: { code: 'KOR', name: 'South Korea', flag: '🇰🇷', group: 'A', rank: 22 },
-  RSA: { code: 'RSA', name: 'South Africa', flag: '🇿🇦', group: 'A', rank: 63 },
-  CZE: { code: 'CZE', name: 'Czechia', flag: '🇨🇿', group: 'A', rank: 46 },
+  MEX: { code: 'MEX', name: 'Mexico', iso: 'mx', group: 'A', rank: 15 },
+  KOR: { code: 'KOR', name: 'South Korea', iso: 'kr', group: 'A', rank: 22 },
+  RSA: { code: 'RSA', name: 'South Africa', iso: 'za', group: 'A', rank: 63 },
+  CZE: { code: 'CZE', name: 'Czechia', iso: 'cz', group: 'A', rank: 46 },
 
-  CAN: { code: 'CAN', name: 'Canada', flag: '🇨🇦', group: 'B', rank: 27 },
-  SUI: { code: 'SUI', name: 'Switzerland', flag: '🇨🇭', group: 'B', rank: 17 },
-  QAT: { code: 'QAT', name: 'Qatar', flag: '🇶🇦', group: 'B', rank: 58 },
-  BIH: { code: 'BIH', name: 'Bosnia and Herzegovina', flag: '🇧🇦', group: 'B', rank: 78 },
+  CAN: { code: 'CAN', name: 'Canada', iso: 'ca', group: 'B', rank: 27 },
+  SUI: { code: 'SUI', name: 'Switzerland', iso: 'ch', group: 'B', rank: 17 },
+  QAT: { code: 'QAT', name: 'Qatar', iso: 'qa', group: 'B', rank: 58 },
+  BIH: { code: 'BIH', name: 'Bosnia and Herzegovina', iso: 'ba', group: 'B', rank: 78 },
 
-  BRA: { code: 'BRA', name: 'Brazil', flag: '🇧🇷', group: 'C', rank: 5 },
-  MAR: { code: 'MAR', name: 'Morocco', flag: '🇲🇦', group: 'C', rank: 11 },
-  SCO: { code: 'SCO', name: 'Scotland', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', group: 'C', rank: 37 },
-  HAI: { code: 'HAI', name: 'Haiti', flag: '🇭🇹', group: 'C', rank: 86 },
+  BRA: { code: 'BRA', name: 'Brazil', iso: 'br', group: 'C', rank: 5 },
+  MAR: { code: 'MAR', name: 'Morocco', iso: 'ma', group: 'C', rank: 11 },
+  SCO: { code: 'SCO', name: 'Scotland', iso: 'gb-sct', group: 'C', rank: 37 },
+  HAI: { code: 'HAI', name: 'Haiti', iso: 'ht', group: 'C', rank: 86 },
 
-  USA: { code: 'USA', name: 'United States', flag: '🇺🇸', group: 'D', rank: 14 },
-  TUR: { code: 'TUR', name: 'Türkiye', flag: '🇹🇷', group: 'D', rank: 25 },
-  PAR: { code: 'PAR', name: 'Paraguay', flag: '🇵🇾', group: 'D', rank: 40 },
-  AUS: { code: 'AUS', name: 'Australia', flag: '🇦🇺', group: 'D', rank: 26 },
+  USA: { code: 'USA', name: 'United States', iso: 'us', group: 'D', rank: 14 },
+  TUR: { code: 'TUR', name: 'Türkiye', iso: 'tr', group: 'D', rank: 25 },
+  PAR: { code: 'PAR', name: 'Paraguay', iso: 'py', group: 'D', rank: 40 },
+  AUS: { code: 'AUS', name: 'Australia', iso: 'au', group: 'D', rank: 26 },
 
-  GER: { code: 'GER', name: 'Germany', flag: '🇩🇪', group: 'E', rank: 9 },
-  ECU: { code: 'ECU', name: 'Ecuador', flag: '🇪🇨', group: 'E', rank: 23 },
-  CIV: { code: 'CIV', name: 'Ivory Coast', flag: '🇨🇮', group: 'E', rank: 44 },
-  CUW: { code: 'CUW', name: 'Curaçao', flag: '🇨🇼', group: 'E', rank: 82 },
+  GER: { code: 'GER', name: 'Germany', iso: 'de', group: 'E', rank: 9 },
+  ECU: { code: 'ECU', name: 'Ecuador', iso: 'ec', group: 'E', rank: 23 },
+  CIV: { code: 'CIV', name: 'Ivory Coast', iso: 'ci', group: 'E', rank: 44 },
+  CUW: { code: 'CUW', name: 'Curaçao', iso: 'cw', group: 'E', rank: 82 },
 
-  NED: { code: 'NED', name: 'Netherlands', flag: '🇳🇱', group: 'F', rank: 7 },
-  JPN: { code: 'JPN', name: 'Japan', flag: '🇯🇵', group: 'F', rank: 19 },
-  SWE: { code: 'SWE', name: 'Sweden', flag: '🇸🇪', group: 'F', rank: 45 },
-  TUN: { code: 'TUN', name: 'Tunisia', flag: '🇹🇳', group: 'F', rank: 41 },
+  NED: { code: 'NED', name: 'Netherlands', iso: 'nl', group: 'F', rank: 7 },
+  JPN: { code: 'JPN', name: 'Japan', iso: 'jp', group: 'F', rank: 19 },
+  SWE: { code: 'SWE', name: 'Sweden', iso: 'se', group: 'F', rank: 45 },
+  TUN: { code: 'TUN', name: 'Tunisia', iso: 'tn', group: 'F', rank: 41 },
 
-  BEL: { code: 'BEL', name: 'Belgium', flag: '🇧🇪', group: 'G', rank: 8 },
-  IRN: { code: 'IRN', name: 'Iran', flag: '🇮🇷', group: 'G', rank: 21 },
-  EGY: { code: 'EGY', name: 'Egypt', flag: '🇪🇬', group: 'G', rank: 34 },
-  NZL: { code: 'NZL', name: 'New Zealand', flag: '🇳🇿', group: 'G', rank: 72 },
+  BEL: { code: 'BEL', name: 'Belgium', iso: 'be', group: 'G', rank: 8 },
+  IRN: { code: 'IRN', name: 'Iran', iso: 'ir', group: 'G', rank: 21 },
+  EGY: { code: 'EGY', name: 'Egypt', iso: 'eg', group: 'G', rank: 34 },
+  NZL: { code: 'NZL', name: 'New Zealand', iso: 'nz', group: 'G', rank: 72 },
 
-  ESP: { code: 'ESP', name: 'Spain', flag: '🇪🇸', group: 'H', rank: 1 },
-  URU: { code: 'URU', name: 'Uruguay', flag: '🇺🇾', group: 'H', rank: 16 },
-  KSA: { code: 'KSA', name: 'Saudi Arabia', flag: '🇸🇦', group: 'H', rank: 60 },
-  CPV: { code: 'CPV', name: 'Cape Verde', flag: '🇨🇻', group: 'H', rank: 70 },
+  ESP: { code: 'ESP', name: 'Spain', iso: 'es', group: 'H', rank: 1 },
+  URU: { code: 'URU', name: 'Uruguay', iso: 'uy', group: 'H', rank: 16 },
+  KSA: { code: 'KSA', name: 'Saudi Arabia', iso: 'sa', group: 'H', rank: 60 },
+  CPV: { code: 'CPV', name: 'Cape Verde', iso: 'cv', group: 'H', rank: 70 },
 
-  FRA: { code: 'FRA', name: 'France', flag: '🇫🇷', group: 'I', rank: 3 },
-  SEN: { code: 'SEN', name: 'Senegal', flag: '🇸🇳', group: 'I', rank: 18 },
-  NOR: { code: 'NOR', name: 'Norway', flag: '🇳🇴', group: 'I', rank: 29 },
-  IRQ: { code: 'IRQ', name: 'Iraq', flag: '🇮🇶', group: 'I', rank: 68 },
+  FRA: { code: 'FRA', name: 'France', iso: 'fr', group: 'I', rank: 3 },
+  SEN: { code: 'SEN', name: 'Senegal', iso: 'sn', group: 'I', rank: 18 },
+  NOR: { code: 'NOR', name: 'Norway', iso: 'no', group: 'I', rank: 29 },
+  IRQ: { code: 'IRQ', name: 'Iraq', iso: 'iq', group: 'I', rank: 68 },
 
-  ARG: { code: 'ARG', name: 'Argentina', flag: '🇦🇷', group: 'J', rank: 2 },
-  AUT: { code: 'AUT', name: 'Austria', flag: '🇦🇹', group: 'J', rank: 24 },
-  ALG: { code: 'ALG', name: 'Algeria', flag: '🇩🇿', group: 'J', rank: 36 },
-  JOR: { code: 'JOR', name: 'Jordan', flag: '🇯🇴', group: 'J', rank: 66 },
+  ARG: { code: 'ARG', name: 'Argentina', iso: 'ar', group: 'J', rank: 2 },
+  AUT: { code: 'AUT', name: 'Austria', iso: 'at', group: 'J', rank: 24 },
+  ALG: { code: 'ALG', name: 'Algeria', iso: 'dz', group: 'J', rank: 36 },
+  JOR: { code: 'JOR', name: 'Jordan', iso: 'jo', group: 'J', rank: 66 },
 
-  POR: { code: 'POR', name: 'Portugal', flag: '🇵🇹', group: 'K', rank: 6 },
-  COL: { code: 'COL', name: 'Colombia', flag: '🇨🇴', group: 'K', rank: 13 },
-  UZB: { code: 'UZB', name: 'Uzbekistan', flag: '🇺🇿', group: 'K', rank: 55 },
-  COD: { code: 'COD', name: 'DR Congo', flag: '🇨🇩', group: 'K', rank: 64 },
+  POR: { code: 'POR', name: 'Portugal', iso: 'pt', group: 'K', rank: 6 },
+  COL: { code: 'COL', name: 'Colombia', iso: 'co', group: 'K', rank: 13 },
+  UZB: { code: 'UZB', name: 'Uzbekistan', iso: 'uz', group: 'K', rank: 55 },
+  COD: { code: 'COD', name: 'DR Congo', iso: 'cd', group: 'K', rank: 64 },
 
-  ENG: { code: 'ENG', name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', group: 'L', rank: 4 },
-  CRO: { code: 'CRO', name: 'Croatia', flag: '🇭🇷', group: 'L', rank: 10 },
-  PAN: { code: 'PAN', name: 'Panama', flag: '🇵🇦', group: 'L', rank: 30 },
-  GHA: { code: 'GHA', name: 'Ghana', flag: '🇬🇭', group: 'L', rank: 75 },
+  ENG: { code: 'ENG', name: 'England', iso: 'gb-eng', group: 'L', rank: 4 },
+  CRO: { code: 'CRO', name: 'Croatia', iso: 'hr', group: 'L', rank: 10 },
+  PAN: { code: 'PAN', name: 'Panama', iso: 'pa', group: 'L', rank: 30 },
+  GHA: { code: 'GHA', name: 'Ghana', iso: 'gh', group: 'L', rank: 75 },
 }
 
 export const TEAM_CODES = Object.keys(TEAMS) as TeamCode[]
