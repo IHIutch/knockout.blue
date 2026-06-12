@@ -5,6 +5,27 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+// takumi-js loads its WASM glue with `import(/* @vite-ignore */ "@takumi-rs/wasm")`.
+// The annotation tells Rollup to leave the bare specifier in the output verbatim,
+// and workerd can't resolve bare specifiers at runtime ('No such module
+// "@takumi-rs/wasm"' → 500 on og.png). Strip the annotation from that one literal
+// import so it gets bundled like any other module; the neighboring
+// `import(nextPath)` variable import keeps its ignore. Delete this plugin once
+// takumi-js drops the annotation upstream.
+const takumiUnignoreWasmImport = {
+  name: 'takumi-unignore-wasm-import',
+  enforce: 'pre' as const,
+  transform(code: string, id: string) {
+    if (!id.includes('takumi-js'))
+      return null
+    const fixed = code.replace(
+      /\/\*\s*@vite-ignore\s*\*\/(\s*["']@takumi-rs\/wasm["'])/g,
+      '$1',
+    )
+    return fixed === code ? null : { code: fixed, map: null }
+  },
+}
+
 // atproto OAuth forbids "localhost" as an origin; dev must run on 127.0.0.1.
 // The loopback client_id below is the spec-defined exception for local dev.
 const DEV_ORIGIN = 'http://127.0.0.1:3000'
@@ -37,6 +58,7 @@ const config = defineConfig(({ command }) => {
       'import.meta.env.VITE_OAUTH_SCOPE': JSON.stringify(OAUTH_SCOPE),
     },
     plugins: [
+      takumiUnignoreWasmImport,
       devtools(),
       cloudflare({ viteEnvironment: { name: 'ssr' } }),
       tailwindcss(),
