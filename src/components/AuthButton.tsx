@@ -14,7 +14,6 @@ export function AuthButton({
 }) {
   const { state, signIn, signOut } = useAuth()
   const [open, setOpen] = useState(false)
-  const [showCustom, setShowCustom] = useState(false)
   const [identifier, setIdentifier] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -92,41 +91,35 @@ export function AuthButton({
                 )}
           </button>
 
-          {!showCustom
-            ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCustom(true)}
-                  className="mt-2 w-full text-center text-xs text-zinc-500 underline-offset-2 hover:text-zinc-300 hover:underline"
-                >
-                  Use a handle or self-hosted PDS instead
-                </button>
-              )
-            : (
-                <form onSubmit={submitCustom} className="mt-3 border-t border-zinc-800 pt-3">
-                  <label htmlFor="auth-handle" className="mb-1.5 block text-xs font-medium text-zinc-400">
-                    Handle, DID, or PDS URL
-                  </label>
-                  <input
-                    id="auth-handle"
-                    autoFocus
-                    value={identifier}
-                    onChange={e => setIdentifier(e.target.value)}
-                    placeholder="you.bsky.social"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={busy || identifier.trim().length === 0}
-                    className="mt-2 w-full rounded-lg border border-sky-700 px-3 py-1.5 text-sm font-medium text-sky-300 transition-colors hover:bg-sky-950 disabled:opacity-50"
-                  >
-                    Continue
-                  </button>
-                </form>
-              )}
+          <form onSubmit={submitCustom} className="mt-3 border-t border-zinc-800 pt-3">
+            <label htmlFor="auth-handle" className="mb-1.5 block text-xs font-medium text-zinc-400">
+              Use a handle or self-hosted PDS instead
+            </label>
+            <input
+              id="auth-handle"
+              autoFocus
+              value={identifier}
+              onChange={e => setIdentifier(e.target.value)}
+              placeholder="you.bsky.social"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={busy || identifier.trim().length === 0}
+              className="mt-2 w-full rounded-lg border border-sky-700 px-3 py-1.5 text-sm font-medium text-sky-300 transition-colors hover:bg-sky-950 disabled:opacity-50"
+            >
+              {busy
+                ? (
+                    'Redirecting…'
+                  )
+                : (
+                    'Continue'
+                  )}
+            </button>
+          </form>
 
           {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
         </div>
