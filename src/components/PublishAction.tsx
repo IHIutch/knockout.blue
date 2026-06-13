@@ -7,7 +7,6 @@ import { useAuth } from '../hooks/useAuth'
 import { publishBracket } from '../server/auth'
 import { AuthButton } from './AuthButton'
 
-/** The right side of the PublishBar: sign-in prompt → publish → share link. */
 export function PublishAction({ data, picksMade }: { data: BracketData, picksMade: number }) {
   const { state } = useAuth()
   const [phase, setPhase] = useState<'idle' | 'publishing' | 'done' | 'error'>('idle')
@@ -16,7 +15,7 @@ export function PublishAction({ data, picksMade }: { data: BracketData, picksMad
   if (state.status === 'loading')
     return null
   if (state.status === 'anonymous') {
-    return <AuthButton label="Sign in to publish" errorDirection="up" />
+    return <AuthButton label="Sign in to publish" panelDirection="up" />
   }
 
   const shareUrl = `${window.location.origin}/b/${state.handle}`
