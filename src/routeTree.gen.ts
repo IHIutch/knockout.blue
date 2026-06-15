@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ChampionsRouteImport } from './routes/champions'
 import { Route as BracketRouteImport } from './routes/bracket'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
@@ -18,6 +19,11 @@ import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as BHandleRouteImport } from './routes/b.$handle'
 import { Route as BHandleOgDotpngRouteImport } from './routes/b.$handle.og[.]png'
 
+const ChampionsRoute = ChampionsRouteImport.update({
+  id: '/champions',
+  path: '/champions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BracketRoute = BracketRouteImport.update({
   id: '/bracket',
   path: '/bracket',
@@ -62,6 +68,7 @@ const BHandleOgDotpngRoute = BHandleOgDotpngRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bracket': typeof BracketRoute
+  '/champions': typeof ChampionsRoute
   '/b/$handle': typeof BHandleRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/groups/thirds': typeof GroupsThirdsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bracket': typeof BracketRoute
+  '/champions': typeof ChampionsRoute
   '/b/$handle': typeof BHandleRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/groups/thirds': typeof GroupsThirdsRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bracket': typeof BracketRoute
+  '/champions': typeof ChampionsRoute
   '/b/$handle': typeof BHandleRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/groups/thirds': typeof GroupsThirdsRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/bracket'
+    | '/champions'
     | '/b/$handle'
     | '/groups/$groupId'
     | '/groups/thirds'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/bracket'
+    | '/champions'
     | '/b/$handle'
     | '/groups/$groupId'
     | '/groups/thirds'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/bracket'
+    | '/champions'
     | '/b/$handle'
     | '/groups/$groupId'
     | '/groups/thirds'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BracketRoute: typeof BracketRoute
+  ChampionsRoute: typeof ChampionsRoute
   BHandleRoute: typeof BHandleRouteWithChildren
   GroupsGroupIdRoute: typeof GroupsGroupIdRoute
   GroupsThirdsRoute: typeof GroupsThirdsRoute
@@ -135,6 +148,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/champions': {
+      id: '/champions'
+      path: '/champions'
+      fullPath: '/champions'
+      preLoaderRoute: typeof ChampionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bracket': {
       id: '/bracket'
       path: '/bracket'
@@ -208,6 +228,7 @@ const BHandleRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BracketRoute: BracketRoute,
+  ChampionsRoute: ChampionsRoute,
   BHandleRoute: BHandleRouteWithChildren,
   GroupsGroupIdRoute: GroupsGroupIdRoute,
   GroupsThirdsRoute: GroupsThirdsRoute,

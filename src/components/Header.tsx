@@ -29,6 +29,13 @@ export function Header({ children }: { children?: ReactNode }) {
             >
               Bracket
             </Link>
+            <Link
+              to="/champions"
+              className="rounded-md px-2.5 py-1.5 text-zinc-400 transition-colors hover:text-zinc-100"
+              activeProps={{ className: 'text-zinc-100' }}
+            >
+              Champions
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-2">{children}</div>
