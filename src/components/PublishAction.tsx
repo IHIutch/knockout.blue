@@ -58,13 +58,6 @@ export function PublishAction({ data, picksMade }: { data: BracketData, picksMad
           />
           {copied ? 'Copied' : 'Copy link'}
         </button>
-        <button
-          type="button"
-          onClick={() => setPhase('idle')}
-          className="text-xs text-zinc-500 underline-offset-2 hover:underline"
-        >
-          Edit more
-        </button>
       </div>
     )
   }
