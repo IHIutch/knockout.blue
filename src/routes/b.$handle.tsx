@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { Bracket } from '../components/Bracket'
-import { Flag } from '../components/Flag'
+import { ChampionHero } from '../components/ChampionHero'
+import { ShareBracketButton } from '../components/ShareBracketButton'
+import { useAuth } from '../hooks/useAuth'
 import { getBracketForActor } from '../lib/atproto/readBracket'
 import { deriveBracket } from '../lib/bracket/derive'
 import { TEAMS } from '../lib/tournament/data'
@@ -48,6 +50,7 @@ export const Route = createFileRoute('/b/$handle')({
 // eslint-disable-next-line react-refresh/only-export-components
 function SharePage() {
   const lookup = Route.useLoaderData()
+  const { state } = useAuth()
 
   if (lookup.status !== 'ok') {
     const message = {
@@ -77,6 +80,7 @@ function SharePage() {
   )
   const derived = deriveBracket(lookup.record.winners, field)
   const champion = derived.champion ? TEAMS[derived.champion] : null
+  const isOwnBracket = state.status === 'signed-in' && state.did === lookup.did
 
   return (
     <main className="mx-auto max-w-7xl px-4 pb-16">
@@ -96,27 +100,31 @@ function SharePage() {
             made
           </p>
         </div>
-        {champion && (
-          <div className="flex items-center gap-3 rounded-xl border border-sky-900/60 bg-sky-950/40 px-4 py-2.5">
-            <Flag code={champion.code} className="h-8 w-11 shrink-0 rounded ring-1 ring-black/10" />
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-sky-300/80">Champion pick</div>
-              <div className="font-semibold text-sky-100">{champion.name}</div>
-            </div>
-          </div>
-        )}
+        {isOwnBracket
+          ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/bracket"
+                  className="rounded-lg border border-sky-700 px-3 py-2.5 text-sm font-medium text-sky-300 transition-colors hover:bg-sky-950"
+                >
+                  Edit Bracket
+                </Link>
+                <ShareBracketButton handle={lookup.handle} championName={champion?.name} />
+              </div>
+            )
+          : (
+              <Link
+                to="/"
+                className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-sky-500"
+              >
+                Make your own bracket
+              </Link>
+            )}
       </section>
 
-      <Bracket derived={derived} interactive={false} />
+      {champion && <ChampionHero champion={champion} />}
 
-      <div className="mt-8 flex justify-center">
-        <Link
-          to="/"
-          className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-sky-500"
-        >
-          Make your own bracket
-        </Link>
-      </div>
+      <Bracket derived={derived} interactive={false} />
     </main>
   )
 }
