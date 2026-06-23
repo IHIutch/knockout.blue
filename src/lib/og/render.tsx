@@ -29,28 +29,29 @@ const colors = {
   accentBg: 'rgba(14, 165, 233, 0.18)',
 }
 
-function TeamLine({ team, picked }: { team: TeamCode | null, picked: boolean }) {
+function TeamLine({ team, picked, isChampion }: { team: TeamCode | null, picked: boolean, isChampion: boolean }) {
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 5,
+        gap: 8,
         padding: '2px 6px',
         borderRadius: 4,
         backgroundColor: picked ? colors.accentBg : 'transparent',
+        outline: isChampion ? `2px solid ${colors.accent}` : 'none',
       }}
     >
       {team
         ? (
-            <img src={flagDataUri(team)} width={16} height={12} style={{ borderRadius: 2 }} />
+            <img src={flagDataUri(team)} width={24} height={18} style={{ borderRadius: 2 }} />
           )
         : (
             <div style={{ display: 'flex', width: 16, height: 12, backgroundColor: colors.border, borderRadius: 2 }} />
           )}
       <span
         style={{
-          fontSize: 13,
+          fontSize: 18,
           fontWeight: picked ? 800 : 500,
           color: team ? (picked ? '#f0f9ff' : colors.text) : colors.dim,
         }}
@@ -61,7 +62,8 @@ function TeamLine({ team, picked }: { team: TeamCode | null, picked: boolean }) 
   )
 }
 
-function MatchBox({ m }: { m: ResolvedMatch }) {
+function MatchBox({ m, champion }: { m: ResolvedMatch, champion: TeamCode | null }) {
+  // const hasChampion = champion === m.home || champion === m.away
   return (
     <div
       style={{
@@ -71,28 +73,29 @@ function MatchBox({ m }: { m: ResolvedMatch }) {
         border: `1px solid ${colors.border}`,
         borderRadius: 6,
         padding: 2,
+
       }}
     >
-      <TeamLine team={m.home} picked={m.picked !== null && m.picked === m.home} />
-      <TeamLine team={m.away} picked={m.picked !== null && m.picked === m.away} />
+      <TeamLine team={m.home} picked={m.picked !== null && m.picked === m.home} isChampion={champion === m.home} />
+      <TeamLine team={m.away} picked={m.picked !== null && m.picked === m.away} isChampion={champion === m.away} />
     </div>
   )
 }
 
-function Column({ matches, derived }: { matches: number[], derived: ResolvedBracket }) {
+function Column({ matches, derived, isEndcap }: { matches: number[], isEndcap?: boolean, derived: ResolvedBracket }) {
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-around',
+        justifyContent: isEndcap ? 'space-between' : 'space-around',
         flexGrow: 1,
         width: 92,
         gap: 4,
       }}
     >
       {matches.map(n => (
-        <MatchBox key={n} m={derived.matches[n]} />
+        <MatchBox key={n} m={derived.matches[n]} champion={derived.champion} />
       ))}
     </div>
   )
@@ -109,57 +112,79 @@ function Center({ derived }: { derived: ResolvedBracket }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        width: 210,
-        gap: 14,
+        // width: 180,
+        // gap: 14,
+        position: 'relative',
+        backgroundColor: 'blue',
+        margin: '0 -12px',
       }}
     >
-      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 3, color: colors.dim }}>
-        CHAMPION
-      </span>
-      {champion
-        ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-              <img
-                src={flagDataUri(champion.code)}
-                width={80}
-                height={60}
-                style={{ borderRadius: 8, border: `2px solid ${colors.accent}` }}
-              />
-              <span style={{ fontSize: 26, fontWeight: 800, color: '#f0f9ff', textAlign: 'center' }}>
-                {champion.name}
-              </span>
-            </div>
-          )
-        : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  width: 80,
-                  height: 60,
-                  borderRadius: 8,
-                  border: `2px dashed ${colors.border}`,
-                }}
-              />
-              <span style={{ fontSize: 20, fontWeight: 700, color: colors.dim }}>TBD</span>
-            </div>
-          )}
-      <div
-        style={{
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+      >
+        <div style={{
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: colors.card,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 8,
-          padding: 6,
-          width: 130,
+          alignItems: 'center',
+          gap: 6,
+          position: 'absolute',
+          top: '-19rem',
         }}
-      >
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: colors.dim, padding: '0 6px 2px' }}>
-          FINAL · JUL 19
-        </span>
-        <TeamLine team={final.home} picked={final.picked !== null && final.picked === final.home} />
-        <TeamLine team={final.away} picked={final.picked !== null && final.picked === final.away} />
+        >
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: 2, color: colors.dim }}>
+            CHAMPION
+          </span>
+          {champion
+            ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, paddingTop: 4 }}>
+                  <img
+                    src={flagDataUri(champion.code)}
+                    // width={160}
+                    // height={120}
+                    style={{ borderRadius: 8, outline: `2px solid ${colors.accent}`, outlineOffset: '2px', aspectRatio: '4 / 3', width: 200 }}
+                  />
+                  <div style={{ fontSize: 26, fontWeight: 800, color: '#f0f9ff', textAlign: 'center', marginTop: 2 }}>
+                    {champion.name}
+                  </div>
+                </div>
+              )
+            : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      width: 80,
+                      height: 60,
+                      borderRadius: 8,
+                      border: `2px dashed ${colors.border}`,
+                    }}
+                  />
+                  <span style={{ fontSize: 20, fontWeight: 700, color: colors.dim }}>TBD</span>
+                </div>
+              )}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: colors.card,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 8,
+            padding: 6,
+            width: 130,
+            top: '4rem',
+            position: 'absolute',
+          }}
+        >
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: colors.dim, padding: '0 6px 2px', textAlign: 'center' }}>
+            FINAL · JUL 19
+          </span>
+          <TeamLine team={final.home} picked={final.picked !== null && final.picked === final.home} isChampion={champion?.code === final.home} />
+          <TeamLine team={final.away} picked={final.picked !== null && final.picked === final.away} isChampion={champion?.code === final.away} />
+        </div>
       </div>
     </div>
   )
@@ -174,10 +199,10 @@ export function BracketImage({ handle, derived }: { handle: string, derived: Res
         width: 1200,
         height: 630,
         backgroundColor: colors.bg,
-        padding: '18px 24px',
+        padding: '12px 12px',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'start' }}>
           <span style={{ fontSize: 24, fontWeight: 800, color: '#fafafa' }}>knockout</span>
           <span style={{ fontSize: 24, fontWeight: 800, color: colors.accent }}>.blue</span>
@@ -187,8 +212,8 @@ export function BracketImage({ handle, derived }: { handle: string, derived: Res
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexGrow: 1, gap: 8 }}>
-        <Column matches={LEFT.r32} derived={derived} />
+      <div style={{ display: 'flex', flexGrow: 1, gap: 24 }}>
+        <Column matches={LEFT.r32} derived={derived} isEndcap />
         <Column matches={LEFT.r16} derived={derived} />
         <Column matches={LEFT.qf} derived={derived} />
         <Column matches={[LEFT.sf]} derived={derived} />
@@ -196,10 +221,10 @@ export function BracketImage({ handle, derived }: { handle: string, derived: Res
         <Column matches={[RIGHT.sf]} derived={derived} />
         <Column matches={RIGHT.qf} derived={derived} />
         <Column matches={RIGHT.r16} derived={derived} />
-        <Column matches={RIGHT.r32} derived={derived} />
+        <Column matches={RIGHT.r32} derived={derived} isEndcap />
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10, position: 'absolute', left: 0, right: 0, bottom: 18 }}>
         <span style={{ fontSize: 24, fontWeight: 700, color: colors.text }}>
           @
           {handle}
