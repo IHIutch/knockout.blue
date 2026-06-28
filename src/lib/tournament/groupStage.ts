@@ -1,6 +1,7 @@
 import type { GroupId, R32Field, TeamCode } from './data'
 
 import { GROUP_IDS, MATCHES, R32_MATCH_NUMBERS, TEAMS } from './data'
+import { THIRD_PLACE_TABLE, WINNER_COLUMN_ORDER, WINNER_MATCH_NUMBER } from './thirdPlaceTable'
 
 /**
  * Group-stage predictions → Round-of-32 field.
@@ -9,7 +10,8 @@ import { GROUP_IDS, MATCHES, R32_MATCH_NUMBERS, TEAMS } from './data'
  * 2 = third place) and pick which eight of the twelve third-place teams
  * advance. Winners and runners-up map straight onto "1A"/"2B" slots; the
  * eight advancing thirds are assigned to the eight constrained third-place
- * slots ("3rd C/E/F/H/I" etc.) by a backtracking matcher.
+ * slots ("3rd C/E/F/H/I" etc.) by FIFA's published allocation table
+ * (Annexe C), looked up by the sorted combination of advancing groups.
  */
 
 /** Ordered top-three picks per group: [winner, runner-up, third]. Partial by design. */
@@ -49,49 +51,37 @@ export const THIRD_PLACE_SLOTS: { match: number, side: 'home' | 'away', candidat
     }),
   )
 
+/** Match number for each WINNER_COLUMN_ORDER index — the table's column order. */
+const TABLE_MATCH_BY_COLUMN = WINNER_COLUMN_ORDER.map(w => WINNER_MATCH_NUMBER[w])
+
 /**
- * Assign eight advancing third-place groups to the eight constrained slots.
- * Deterministic backtracking: always fill the most-constrained slot first,
- * trying groups in alphabetical order. FIFA's slot sets admit a matching for
- * every 8-of-12 combination (exhaustively verified in tests).
+ * Assign eight advancing third-place groups to their eight Round-of-32 slots
+ * using FIFA's official allocation table (Annexe C, see `./thirdPlaceTable`).
  *
- * Returns null when `advancing` isn't exactly eight distinct groups.
+ * The candidate sets ("3rd C/E/F/H/I" etc.) don't uniquely determine the
+ * pairing — every 8-of-12 combination admits many candidate-respecting
+ * matchings — so FIFA pre-published one fixed choice per combination. This is
+ * a direct lookup of that table, keyed by the sorted combination, returning a
+ * Map from FIFA match number to the third-place group that fills it.
+ *
+ * Returns null when `advancing` isn't exactly eight distinct groups. Every
+ * valid 8-of-12 combination is present in the table, so a non-null input of
+ * eight distinct groups always resolves.
  */
 export function assignThirdPlaceSlots(advancing: GroupId[]): Map<number, GroupId> | null {
   const groups = [...new Set(advancing)].sort()
   if (groups.length !== 8)
     return null
 
+  const row = THIRD_PLACE_TABLE[groups.join('')]
+  if (!row)
+    return null
+
   const assignment = new Map<number, GroupId>()
-  const used = new Set<GroupId>()
+  for (let i = 0; i < TABLE_MATCH_BY_COLUMN.length; i++)
+    assignment.set(TABLE_MATCH_BY_COLUMN[i], row[i] as GroupId)
 
-  const solve = (): boolean => {
-    if (assignment.size === THIRD_PLACE_SLOTS.length)
-      return true
-
-    let target: { match: number, options: GroupId[] } | null = null
-    for (const slot of THIRD_PLACE_SLOTS) {
-      if (assignment.has(slot.match))
-        continue
-      const options = slot.candidates.filter(g => groups.includes(g) && !used.has(g))
-      if (!target || options.length < target.options.length)
-        target = { match: slot.match, options }
-    }
-    if (!target)
-      return false
-
-    for (const group of target.options) {
-      assignment.set(target.match, group)
-      used.add(group)
-      if (solve())
-        return true
-      assignment.delete(target.match)
-      used.delete(group)
-    }
-    return false
-  }
-
-  return solve() ? assignment : null
+  return assignment
 }
 
 /**

@@ -50,22 +50,25 @@ function comboGroups(key: string): GroupId[] {
 }
 
 /**
- * FIFA's published 495-row table. Key = sorted combination of advancing groups.
- * Value = { matchNumber: groupId } for the eight third-place slots.
+ * Independent external anchor rows for FIFA's allocation. Key = sorted
+ * combination of advancing groups. Value = { matchNumber: groupId } for the
+ * eight third-place slots.
  *
- * ⚠️ Populate every row from FIFA's official source (the published match
- * schedule / third-place allocation table). Only the rows present here are
- * checked, so the suite is meaningful as soon as the first row is added and
- * becomes exhaustive once all 495 are filled.
+ * The full 495-row Annexe C table now backs `assignThirdPlaceSlots` directly
+ * (see `./thirdPlaceTable`), and its structural integrity — all 495 present,
+ * every row a candidate-respecting bijection — is asserted exhaustively in
+ * `groupStage.test.ts`. Re-listing all 495 expected rows here would just be
+ * the table checked against a copy of itself.
  *
- * The single row below is verified against live reporting of the real
- * tournament: combination {A,C,D,F,G,H,J,K} gives
+ * So this file keeps only rows verified against a source *independent* of that
+ * table, to catch a table that is internally consistent but wrong. The row
+ * below is verified against live reporting of the real tournament:
+ * combination {A,C,D,F,G,H,J,K} gives
  *   1A vs 3rd H, 1E vs 3rd C, 1I vs 3rd F, 1D vs 3rd J,
  *   1G vs 3rd A, 1K vs 3rd D, 1L vs 3rd K, 1B vs 3rd G.
  */
 const FIFA_THIRD_PLACE_TABLE: Record<string, ThirdPlaceRow> = {
   ACDFGHJK: { 74: 'C', 77: 'F', 79: 'H', 80: 'K', 81: 'J', 82: 'A', 85: 'G', 87: 'D' },
-  // TODO: add the remaining 494 rows from FIFA's published allocation table.
 }
 
 describe('third-place slot assignment matches FIFA\'s official table', () => {
@@ -92,12 +95,11 @@ describe('third-place slot assignment matches FIFA\'s official table', () => {
     }
   })
 
-  // Flip to a real `it` once the table is fully populated to guarantee total coverage.
-  it.skip('covers all 495 combinations', () => {
-    expect(rows.length).toBe(495)
-    for (const [key] of rows) {
-      expect(key.length, `combo "${key}" must list exactly 8 groups`).toBe(8)
-      expect(comboKey(comboGroups(key)), `combo "${key}" must be sorted/canonical`).toBe(key)
-    }
+  // Anchor rows must be canonical (sorted, 8 groups) so the lookup key matches.
+  // Exhaustive 495-combination coverage is asserted in groupStage.test.ts
+  // against the table that actually backs assignThirdPlaceSlots.
+  it.each(rows)('anchor combination %s is canonical', (key) => {
+    expect(key.length, `combo "${key}" must list exactly 8 groups`).toBe(8)
+    expect(comboKey(comboGroups(key)), `combo "${key}" must be sorted/canonical`).toBe(key)
   })
 })
