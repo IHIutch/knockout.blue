@@ -12,6 +12,11 @@ import {
   sanitizeGroupPicks,
   THIRD_PLACE_SLOTS,
 } from './groupStage'
+import {
+  THIRD_PLACE_TABLE,
+  WINNER_COLUMN_ORDER,
+  WINNER_MATCH_NUMBER,
+} from './thirdPlaceTable'
 
 /** Top three of every group by FIFA rank — a complete, valid prediction. */
 function chalkGroupPicks(): GroupPicksMap {
@@ -85,6 +90,43 @@ describe('assignThirdPlaceSlots', () => {
     expect(assignThirdPlaceSlots(['A', 'B', 'C'])).toBeNull()
     expect(assignThirdPlaceSlots(['A', 'A', 'B', 'C', 'D', 'E', 'F', 'G'])).toBeNull()
     expect(assignThirdPlaceSlots(GROUP_IDS)).toBeNull()
+  })
+})
+
+describe('thirdPlaceTable integrity (Annexe C)', () => {
+  const candidatesByMatch = new Map(
+    THIRD_PLACE_SLOTS.map(s => [s.match, new Set(s.candidates)]),
+  )
+  const entries = Object.entries(THIRD_PLACE_TABLE)
+
+  it('contains exactly the 495 distinct combinations', () => {
+    expect(entries.length).toBe(495)
+    const expected = [...combinations(GROUP_IDS, 8)].map(c => c.join(''))
+    expect(new Set(Object.keys(THIRD_PLACE_TABLE))).toEqual(new Set(expected))
+  })
+
+  it('keys are sorted, 8 distinct groups', () => {
+    for (const [combo] of entries) {
+      expect(combo.length).toBe(8)
+      expect(new Set(combo).size).toBe(8)
+      expect([...combo].sort().join('')).toBe(combo)
+    }
+  })
+
+  it('every row is a bijection onto the combination, within candidate sets', () => {
+    for (const [combo, value] of entries) {
+      expect(value.length, `row ${combo}`).toBe(WINNER_COLUMN_ORDER.length)
+      // bijection: the assigned groups are exactly the combination's groups
+      expect([...value].sort().join(''), `row ${combo} is not a permutation`).toBe(combo)
+      // each assignment respects its slot's published candidate set
+      WINNER_COLUMN_ORDER.forEach((winner, i) => {
+        const match = WINNER_MATCH_NUMBER[winner]
+        expect(
+          candidatesByMatch.get(match)!.has(value[i] as GroupId),
+          `row ${combo}: ${winner} (match ${match}) = 3${value[i]} not in candidates`,
+        ).toBe(true)
+      })
+    }
   })
 })
 
