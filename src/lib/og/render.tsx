@@ -12,12 +12,8 @@ import { render } from 'takumi-js'
 import type { ResolvedBracket, ResolvedMatch } from '../bracket/derive'
 import type { TeamCode } from '../tournament/data'
 
-import { TEAMS } from '../tournament/data'
+import { BRACKET_HALVES, TEAMS } from '../tournament/data'
 import { flagDataUri } from '../tournament/flags'
-
-/** Bracket halves: matches feeding SF 101 read left→center, SF 102 center←right. */
-const LEFT = { r32: [74, 77, 73, 75, 83, 84, 81, 82], r16: [89, 90, 93, 94], qf: [97, 98], sf: 101 }
-const RIGHT = { r32: [76, 78, 79, 80, 86, 88, 85, 87], r16: [91, 92, 95, 96], qf: [99, 100], sf: 102 }
 
 const colors = {
   bg: '#09090b',
@@ -82,7 +78,7 @@ function MatchBox({ m, champion }: { m: ResolvedMatch, champion: TeamCode | null
   )
 }
 
-function Column({ matches, derived, isEndcap }: { matches: number[], isEndcap?: boolean, derived: ResolvedBracket }) {
+function Column({ matches, derived, isEndcap }: { matches: readonly number[], isEndcap?: boolean, derived: ResolvedBracket }) {
   return (
     <div
       style={{
@@ -213,15 +209,15 @@ export function BracketImage({ handle, derived }: { handle: string, derived: Res
       </div>
 
       <div style={{ display: 'flex', flexGrow: 1, gap: 24 }}>
-        <Column matches={LEFT.r32} derived={derived} isEndcap />
-        <Column matches={LEFT.r16} derived={derived} />
-        <Column matches={LEFT.qf} derived={derived} />
-        <Column matches={[LEFT.sf]} derived={derived} />
+        <Column matches={BRACKET_HALVES.left.r32} derived={derived} isEndcap />
+        <Column matches={BRACKET_HALVES.left.r16} derived={derived} />
+        <Column matches={BRACKET_HALVES.left.qf} derived={derived} />
+        <Column matches={BRACKET_HALVES.left.sf} derived={derived} />
         <Center derived={derived} />
-        <Column matches={[RIGHT.sf]} derived={derived} />
-        <Column matches={RIGHT.qf} derived={derived} />
-        <Column matches={RIGHT.r16} derived={derived} />
-        <Column matches={RIGHT.r32} derived={derived} isEndcap />
+        <Column matches={BRACKET_HALVES.right.sf} derived={derived} />
+        <Column matches={BRACKET_HALVES.right.qf} derived={derived} />
+        <Column matches={BRACKET_HALVES.right.r16} derived={derived} />
+        <Column matches={BRACKET_HALVES.right.r32} derived={derived} isEndcap />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10, position: 'absolute', left: 0, right: 0, bottom: 18 }}>

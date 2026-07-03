@@ -144,6 +144,39 @@ export const ROUNDS: Round[] = [
   { id: 'final', label: 'Final', shortLabel: 'Final', dates: 'Jul 19', matches: [104] },
 ]
 
+/**
+ * Visual bracket order. Unlike ROUNDS, this follows the tournament tree:
+ * first the half feeding semifinal 101, then the half feeding semifinal 102.
+ */
+export const BRACKET_HALVES = {
+  left: {
+    r32: [74, 77, 73, 75, 83, 84, 81, 82],
+    r16: [89, 90, 93, 94],
+    qf: [97, 98],
+    sf: [101],
+  },
+  right: {
+    r32: [76, 78, 79, 80, 86, 88, 85, 87],
+    r16: [91, 92, 95, 96],
+    qf: [99, 100],
+    sf: [102],
+  },
+} as const
+
+export const BRACKET_ROUND_MATCHES: Record<RoundId, number[]> = {
+  r32: [...BRACKET_HALVES.left.r32, ...BRACKET_HALVES.right.r32],
+  r16: [...BRACKET_HALVES.left.r16, ...BRACKET_HALVES.right.r16],
+  qf: [...BRACKET_HALVES.left.qf, ...BRACKET_HALVES.right.qf],
+  sf: [...BRACKET_HALVES.left.sf, ...BRACKET_HALVES.right.sf],
+  thirdPlace: [103],
+  final: [104],
+}
+
+export const BRACKET_VIEW_ROUNDS: Round[] = ROUNDS.map(round => ({
+  ...round,
+  matches: BRACKET_ROUND_MATCHES[round.id],
+}))
+
 function range(from: number, to: number): number[] {
   return Array.from({ length: to - from + 1 }, (_, i) => from + i)
 }

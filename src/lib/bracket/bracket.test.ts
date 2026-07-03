@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import type { WinnersMap } from './schema'
 
 import {
+  BRACKET_ROUND_MATCHES,
+  BRACKET_VIEW_ROUNDS,
   MATCH_NUMBERS,
   MATCHES,
   R32_MATCH_NUMBERS,
@@ -41,6 +43,24 @@ describe('tournament data', () => {
         }
       }
     }
+  })
+
+  it('orders bracket display rounds by path, not match number', () => {
+    expect(BRACKET_ROUND_MATCHES.r32).toEqual([
+      74, 77, 73, 75, 83, 84, 81, 82,
+      76, 78, 79, 80, 86, 88, 85, 87,
+    ])
+    expect(BRACKET_ROUND_MATCHES.r16).toEqual([89, 90, 93, 94, 91, 92, 95, 96])
+    expect(BRACKET_ROUND_MATCHES.qf).toEqual([97, 98, 99, 100])
+    expect(BRACKET_ROUND_MATCHES.sf).toEqual([101, 102])
+    expect(BRACKET_VIEW_ROUNDS.map(round => [round.id, round.matches])).toEqual([
+      ['r32', BRACKET_ROUND_MATCHES.r32],
+      ['r16', BRACKET_ROUND_MATCHES.r16],
+      ['qf', BRACKET_ROUND_MATCHES.qf],
+      ['sf', BRACKET_ROUND_MATCHES.sf],
+      ['thirdPlace', [103]],
+      ['final', [104]],
+    ])
   })
 
   it('dev fixture fills every R32 match with distinct teams', () => {

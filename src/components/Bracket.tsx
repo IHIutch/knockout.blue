@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 import type { ResolvedBracket } from '../lib/bracket/derive'
 import type { RoundId, TeamCode } from '../lib/tournament/data'
 
-import { MATCHES, ROUNDS } from '../lib/tournament/data'
+import { BRACKET_VIEW_ROUNDS, MATCHES } from '../lib/tournament/data'
 import { MatchCard } from './MatchCard'
 
 export function Bracket({
@@ -47,7 +47,7 @@ export function Bracket({
   return (
     <div>
       <nav className="sticky top-0 z-10 -mx-4 mb-3 flex gap-1 overflow-x-auto bg-zinc-950/90 px-4 py-2 backdrop-blur">
-        {ROUNDS.map(round => (
+        {BRACKET_VIEW_ROUNDS.map(round => (
           <button
             key={round.id}
             type="button"
@@ -69,7 +69,7 @@ export function Bracket({
         onScroll={onScroll}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4"
       >
-        {ROUNDS.map(round => (
+        {BRACKET_VIEW_ROUNDS.map(round => (
           <div
             key={round.id}
             ref={(el) => {
